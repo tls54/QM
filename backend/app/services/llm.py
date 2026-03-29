@@ -12,14 +12,15 @@ def get_client() -> Groq:
     return _client
 
 
-def chat(system_prompt: str, history: list[dict], user_message: str) -> str:
-    settings = get_settings()
-    client = get_client()
-
+def _build_messages(system_prompt: str, history: list[dict], user_message: str) -> list[dict]:
     messages = [{"role": "system", "content": system_prompt}]
     messages.extend(history)
     messages.append({"role": "user", "content": user_message})
+    return messages
 
+
+def _base_kwargs(messages: list[dict]) -> dict:
+    settings = get_settings()
     kwargs: dict = dict(
         model=settings.model,
         messages=messages,
@@ -27,9 +28,15 @@ def chat(system_prompt: str, history: list[dict], user_message: str) -> str:
         temperature=settings.temperature,
         top_p=settings.top_p,
     )
-
     if settings.reasoning_effort is not None:
         kwargs["reasoning_effort"] = settings.reasoning_effort
+    return kwargs
 
-    response = client.chat.completions.create(**kwargs)
-    return response.choices[0].message.content or ""
+
+def stream(system_prompt: str, history: list[dict], user_message: str):
+    """Return a Groq streaming completion iterator."""
+    client = get_client()
+    messages = _build_messages(system_prompt, history, user_message)
+    kwargs = _base_kwargs(messages)
+    kwargs["stream"] = True
+    return client.chat.completions.create(**kwargs)

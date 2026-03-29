@@ -33,12 +33,6 @@ private struct AskRequestDTO: Encodable {
     let history: [ConversationMessageDTO]
 }
 
-struct AskResponseDTO: Decodable {
-    let answer: String
-    let mode: String
-    let sources: [String]
-}
-
 // MARK: - Client
 
 struct APIClient {
@@ -50,7 +44,9 @@ struct APIClient {
         return f
     }()
 
-    func ask(query: String, mode: String, kits: [Kit], history: [ConversationMessageDTO] = []) async throws -> AskResponseDTO {
+    // MARK: - Request builder
+
+    private func buildRequest(query: String, mode: String, kits: [Kit], history: [ConversationMessageDTO]) throws -> URLRequest {
         let baseURL = UserDefaults.standard.string(forKey: "backendURL") ?? ""
         let secretKey = UserDefaults.standard.string(forKey: "secretKey") ?? ""
         guard !baseURL.isEmpty, let url = URL(string: baseURL.trimmingCharacters(in: .whitespaces) + "/ask") else {
@@ -85,12 +81,34 @@ struct APIClient {
         request.setValue("Bearer \(secretKey)", forHTTPHeaderField: "Authorization")
         request.httpBody = try JSONEncoder().encode(body)
         request.timeoutInterval = 60
+        return request
+    }
 
-        let (data, response) = try await URLSession.shared.data(for: request)
-        guard let http = response as? HTTPURLResponse, http.statusCode == 200 else {
-            throw APIError.badResponse((response as? HTTPURLResponse)?.statusCode ?? 0)
+    // MARK: - Streaming
+
+    func stream(query: String, mode: String, kits: [Kit], history: [ConversationMessageDTO] = []) -> AsyncThrowingStream<String, Error> {
+        AsyncThrowingStream { continuation in
+            Task {
+                do {
+                    let request = try buildRequest(query: query, mode: mode, kits: kits, history: history)
+                    let (bytes, response) = try await URLSession.shared.bytes(for: request)
+                    guard let http = response as? HTTPURLResponse, http.statusCode == 200 else {
+                        continuation.finish(throwing: APIError.badResponse((response as? HTTPURLResponse)?.statusCode ?? 0))
+                        return
+                    }
+                    for try await line in bytes.lines {
+                        guard line.hasPrefix("data: ") else { continue }
+                        let payload = String(line.dropFirst(6))
+                        if payload == "[DONE]" { break }
+                        // Unescape newlines encoded by the backend
+                        continuation.yield(payload.replacingOccurrences(of: "\\n", with: "\n"))
+                    }
+                    continuation.finish()
+                } catch {
+                    continuation.finish(throwing: error)
+                }
+            }
         }
-        return try JSONDecoder().decode(AskResponseDTO.self, from: data)
     }
 }
 

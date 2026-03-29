@@ -9,6 +9,7 @@ struct AssistantView: View {
     @State private var messages: [ChatMessage] = []
     @State private var input = ""
     @State private var isLoading = false
+    @State private var streamingContent = ""
     @State private var error: String?
     @State private var mode: AssistantMode = .ask
     @State private var selectedKitIDs: Set<PersistentIdentifier> = []
@@ -36,14 +37,18 @@ struct AssistantView: View {
                 ScrollViewReader { proxy in
                     ScrollView {
                         LazyVStack(alignment: .leading, spacing: 12) {
-                            if messages.isEmpty {
+                            if messages.isEmpty && !isLoading {
                                 emptyState
                             }
                             ForEach(messages) { message in
                                 ChatBubble(message: message)
                                     .id(message.id)
                             }
-                            if isLoading {
+                            // Streaming bubble — shows tokens as they arrive
+                            if isLoading && !streamingContent.isEmpty {
+                                ChatBubble(message: ChatMessage(role: .assistant, content: streamingContent))
+                                    .id("streaming")
+                            } else if isLoading {
                                 TypingIndicator()
                                     .id("typing")
                             }
@@ -64,6 +69,9 @@ struct AssistantView: View {
                     }
                     .onChange(of: isLoading) {
                         if isLoading { withAnimation { proxy.scrollTo("typing", anchor: .bottom) } }
+                    }
+                    .onChange(of: streamingContent) {
+                        proxy.scrollTo("streaming", anchor: .bottom)
                     }
                 }
 
@@ -153,7 +161,12 @@ struct AssistantView: View {
                 KitPickerSheet(kits: kits, selectedKitIDs: $selectedKitIDs)
             }
             .sheet(isPresented: $showingHistory) {
-                ChatHistorySheet(conversations: conversations, onLoad: loadConversation, onDelete: deleteConversation)
+                ChatHistorySheet(
+                    conversations: conversations,
+                    onLoad: loadConversation,
+                    onDelete: deleteConversation,
+                    onRename: renameConversation
+                )
             }
         }
     }
@@ -181,6 +194,7 @@ struct AssistantView: View {
         guard !query.isEmpty else { return }
         input = ""
         error = nil
+        streamingContent = ""
 
         let userMessage = ChatMessage(role: .user, content: query)
         messages.append(userMessage)
@@ -190,15 +204,22 @@ struct AssistantView: View {
         let history = messages.dropLast().map {
             ConversationMessageDTO(role: $0.role == .user ? "user" : "assistant", content: $0.content)
         }
+        let kitsSnapshot = contextKits
+        let modeSnapshot = mode.rawValue
 
         Task {
             do {
-                let response = try await APIClient.shared.ask(query: query, mode: mode.rawValue, kits: contextKits, history: history)
-                let assistantMessage = ChatMessage(role: .assistant, content: response.answer)
+                let stream = APIClient.shared.stream(query: query, mode: modeSnapshot, kits: kitsSnapshot, history: history)
+                for try await token in stream {
+                    streamingContent += token
+                }
+                let assistantMessage = ChatMessage(role: .assistant, content: streamingContent)
                 messages.append(assistantMessage)
                 persistMessage(assistantMessage)
+                streamingContent = ""
             } catch {
                 self.error = error.localizedDescription
+                streamingContent = ""
             }
             isLoading = false
         }
@@ -230,6 +251,7 @@ struct AssistantView: View {
     private func startNewChat() {
         messages = []
         error = nil
+        streamingContent = ""
         currentConversation = nil
         selectedKitIDs = []
     }
@@ -250,6 +272,10 @@ struct AssistantView: View {
         }
         modelContext.delete(conversation)
     }
+
+    private func renameConversation(_ conversation: Conversation, _ newTitle: String) {
+        conversation.title = newTitle
+    }
 }
 
 // MARK: - Chat history sheet
@@ -258,7 +284,11 @@ private struct ChatHistorySheet: View {
     let conversations: [Conversation]
     let onLoad: (Conversation) -> Void
     let onDelete: (Conversation) -> Void
+    let onRename: (Conversation, String) -> Void
     @Environment(\.dismiss) private var dismiss
+
+    @State private var renamingConversation: Conversation?
+    @State private var renameText = ""
 
     private let dateFormatter: RelativeDateTimeFormatter = {
         let f = RelativeDateTimeFormatter()
@@ -270,7 +300,11 @@ private struct ChatHistorySheet: View {
         NavigationStack {
             Group {
                 if conversations.isEmpty {
-                    ContentUnavailableView("No Chats Yet", systemImage: "bubble.left.and.bubble.right", description: Text("Your conversations will appear here."))
+                    ContentUnavailableView(
+                        "No Chats Yet",
+                        systemImage: "bubble.left.and.bubble.right",
+                        description: Text("Your conversations will appear here.")
+                    )
                 } else {
                     List {
                         ForEach(conversations) { conversation in
@@ -282,9 +316,12 @@ private struct ChatHistorySheet: View {
                                         .foregroundStyle(.primary)
                                         .lineLimit(1)
                                     HStack(spacing: 8) {
-                                        Label(conversation.mode.capitalized, systemImage: conversation.mode == "emergency" ? "exclamationmark.triangle" : "bubble.left")
-                                            .font(.caption)
-                                            .foregroundStyle(.secondary)
+                                        Label(
+                                            conversation.mode.capitalized,
+                                            systemImage: conversation.mode == "emergency" ? "exclamationmark.triangle" : "bubble.left"
+                                        )
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
                                         Text("·")
                                             .foregroundStyle(.secondary)
                                             .font(.caption)
@@ -305,6 +342,28 @@ private struct ChatHistorySheet: View {
                                     Label("Delete", systemImage: "trash")
                                 }
                             }
+                            .swipeActions(edge: .leading) {
+                                Button {
+                                    renameText = conversation.title
+                                    renamingConversation = conversation
+                                } label: {
+                                    Label("Rename", systemImage: "pencil")
+                                }
+                                .tint(.orange)
+                            }
+                            .contextMenu {
+                                Button {
+                                    renameText = conversation.title
+                                    renamingConversation = conversation
+                                } label: {
+                                    Label("Rename", systemImage: "pencil")
+                                }
+                                Button(role: .destructive) {
+                                    onDelete(conversation)
+                                } label: {
+                                    Label("Delete", systemImage: "trash")
+                                }
+                            }
                         }
                     }
                 }
@@ -315,6 +374,19 @@ private struct ChatHistorySheet: View {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Done") { dismiss() }
                 }
+            }
+            .alert("Rename Chat", isPresented: .init(
+                get: { renamingConversation != nil },
+                set: { if !$0 { renamingConversation = nil } }
+            )) {
+                TextField("Title", text: $renameText)
+                Button("Save") {
+                    if let conversation = renamingConversation, !renameText.trimmingCharacters(in: .whitespaces).isEmpty {
+                        onRename(conversation, renameText.trimmingCharacters(in: .whitespaces))
+                    }
+                    renamingConversation = nil
+                }
+                Button("Cancel", role: .cancel) { renamingConversation = nil }
             }
         }
     }

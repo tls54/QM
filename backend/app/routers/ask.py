@@ -1,7 +1,7 @@
-import json
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.responses import StreamingResponse
 from app.auth import require_auth
-from app.models.schemas import AskRequest, AskResponse
+from app.models.schemas import AskRequest
 from app.services import llm, rag
 
 router = APIRouter(dependencies=[Depends(require_auth)])
@@ -31,7 +31,7 @@ def _inventory_summary(request: AskRequest) -> str:
 def _build_system_prompt(mode: str, context_chunks: list[str], inventory_summary: str) -> str:
     knowledge = "\n\n".join(context_chunks) if context_chunks else "No knowledge base context available yet."
 
-    base = f"""You are QM, an AI assistant for first aid kit management and outdoor preparedness.
+    base = f"""You are QM, an AI assistant specialising in first aid kit management and outdoor preparedness.
 You have access to the user's current inventory and a first aid knowledge base.
 
 ## User's Inventory
@@ -44,35 +44,45 @@ You have access to the user's current inventory and a first aid knowledge base.
     if mode == "emergency":
         base += """
 ## Instructions
-The user is in or preparing for an emergency situation. Be concise and direct.
-Respond with a numbered step-by-step protocol. Surface any relevant items from
-their inventory inline (mark as ✓ if they have it, ✗ if missing).
-Do not add preamble or caveats — get straight to the steps.
+The user is in an emergency. Respond ONLY with a numbered step-by-step protocol.
+- No preamble, no caveats, no sign-off
+- One sentence per step, lead with a verb
+- For each step requiring an item, append ✓ if the user has it or ✗ if missing, based on their inventory above
+- If quantity is 0, treat as missing (✗)
 """
     else:
         base += """
 ## Instructions
-Answer the user's question helpfully and accurately using the knowledge base and
-inventory context above. If inventory is relevant, reference it specifically.
-Be clear and practical.
+- Answer clearly and practically using the knowledge base and inventory context above
+- Use **bold** for key terms, numbered lists for steps, bullet points for lists of items
+- Reference the user's inventory specifically when relevant (e.g. "You have X in your Trek kit")
+- Keep responses concise — detailed when detail is needed, brief for simple questions
+- Only reference items that are present in the inventory above — do not invent items the user doesn't have
+- If the question is outside first aid, kit management, or outdoor preparedness, politely say so
 """
     return base
 
 
-@router.post("/ask", response_model=AskResponse)
-async def ask(request: AskRequest) -> AskResponse:
+def _sse_generator(chunks):
+    """Yield SSE-formatted tokens from a Groq streaming response."""
+    for chunk in chunks:
+        content = chunk.choices[0].delta.content
+        if content:
+            # Escape newlines so each SSE message stays on one line
+            yield f"data: {content.replace(chr(10), '\\n')}\n\n"
+    yield "data: [DONE]\n\n"
+
+
+@router.post("/ask")
+async def ask(request: AskRequest) -> StreamingResponse:
     if not request.query.strip():
         raise HTTPException(status_code=400, detail="Query must not be empty")
 
     context_chunks = rag.retrieve(request.query)
     inventory_summary = _inventory_summary(request)
     system_prompt = _build_system_prompt(request.mode, context_chunks, inventory_summary)
-
     history = [{"role": m.role, "content": m.content} for m in request.history]
-    answer = llm.chat(system_prompt=system_prompt, history=history, user_message=request.query)
 
-    return AskResponse(
-        answer=answer,
-        mode=request.mode,
-        sources=context_chunks,
-    )
+    chunks = llm.stream(system_prompt=system_prompt, history=history, user_message=request.query)
+
+    return StreamingResponse(_sse_generator(chunks), media_type="text/event-stream")
