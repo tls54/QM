@@ -5,6 +5,7 @@ struct SettingsView: View {
     @AppStorage("appearancePreference") private var appearancePreference = "system"
     @AppStorage("expiryWarningDays")    private var expiryWarningDays = 30
     @AppStorage("lowStockThreshold")    private var lowStockThreshold = 1
+    @AppStorage("backendURL")           private var backendURL = ""
 
     @Environment(\.modelContext) private var modelContext
     @Query private var kits: [Kit]
@@ -59,6 +60,17 @@ struct SettingsView: View {
                     Text("Data")
                 } footer: {
                     Text("Deletes all kits and items permanently. The store will be recreated empty.")
+                }
+
+                Section {
+                    TextField("https://your-app.railway.app", text: $backendURL)
+                        .keyboardType(.URL)
+                        .textInputAutocapitalization(.never)
+                        .autocorrectionDisabled()
+                } header: {
+                    Text("Backend")
+                } footer: {
+                    Text("The URL of your deployed QM backend. Required for the AI Assistant.")
                 }
 
                 Section("About") {
