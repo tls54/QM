@@ -29,7 +29,7 @@ env/
 dist/
 .pytest_cache/
 .ruff_cache/
-
+claude.md
 # macOS
 .DS_Store
 .AppleDouble

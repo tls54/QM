@@ -8,7 +8,7 @@ A local-first iOS app for managing first aid and outdoor equipment inventory, wi
 |--------|-------------|--------|
 | 1 | First Aid Kit Manager | ✅ Complete |
 | 2 | General Outdoors Kit Manager | ✅ Complete |
-| 3 | AI Assistant (Ask + Emergency modes) | 🚧 In Progress |
+| 3 | AI Assistant (Ask mode live, Emergency mode pending) | 🚧 In Progress |
 
 ---
 
@@ -19,7 +19,7 @@ A local-first iOS app for managing first aid and outdoor equipment inventory, wi
 - **Store inventory** — a special store/stockroom kit that's always present; move items between kits
 - **Inventory view** — aggregates quantities across all kits, surfaces the worst expiry status per item
 - **Expiry and stock alerts** — configurable expiry warning threshold and low stock threshold
-- **AI assistant** (Stream 3, in progress) — conversational Ask mode and a tap-based Emergency mode with step-by-step protocols referenced against your current inventory
+- **AI assistant** (Stream 3) — conversational Ask mode (live) and a tap-based Emergency mode with step-by-step protocols referenced against your current inventory (in progress)
 
 ---
 
@@ -86,7 +86,7 @@ All config is driven by environment variables. Only `GROQ_API_KEY` is required �
 | `TOP_P` | `1.0` | Nucleus sampling |
 | `REASONING_EFFORT` | unset | Thinking level for supported models: `none`, `default`, `turbo` |
 
-For production deployment, set these as environment variables in your host (Railway, Fly.io, etc.) rather than using a `.env` file.
+For production deployment, set these as environment variables in your host rather than using a `.env` file. The backend is currently deployed on Railway — configure the public URL in the iOS app under **Settings → Backend**.
 
 **Architecture**
 - FastAPI + Uvicorn
