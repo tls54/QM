@@ -6,8 +6,9 @@ WORKDIR /app
 COPY pyproject.toml .
 RUN pip install --no-cache-dir .
 
-# Copy application code
+# Copy application code and persisted vector index
 COPY app/ app/
+COPY chroma_db/ chroma_db/
 
 EXPOSE 8000
 

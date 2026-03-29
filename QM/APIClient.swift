@@ -31,6 +31,7 @@ private struct AskRequestDTO: Encodable {
     let mode: String
     let inventory: InventoryContextDTO?
     let history: [ConversationMessageDTO]
+    let use_rag: Bool
 }
 
 // MARK: - Client
@@ -46,7 +47,7 @@ struct APIClient {
 
     // MARK: - Request builder
 
-    private func buildRequest(query: String, mode: String, kits: [Kit], history: [ConversationMessageDTO]) throws -> URLRequest {
+    private func buildRequest(query: String, mode: String, kits: [Kit], history: [ConversationMessageDTO], useRAG: Bool = true) throws -> URLRequest {
         let baseURL = UserDefaults.standard.string(forKey: "backendURL") ?? ""
         let secretKey = UserDefaults.standard.string(forKey: "secretKey") ?? ""
         guard !baseURL.isEmpty, let url = URL(string: baseURL.trimmingCharacters(in: .whitespaces) + "/ask") else {
@@ -73,7 +74,7 @@ struct APIClient {
             )
         })
 
-        let body = AskRequestDTO(query: query, mode: mode, inventory: inventory, history: history)
+        let body = AskRequestDTO(query: query, mode: mode, inventory: inventory, history: history, use_rag: useRAG)
 
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
@@ -86,11 +87,11 @@ struct APIClient {
 
     // MARK: - Streaming
 
-    func stream(query: String, mode: String, kits: [Kit], history: [ConversationMessageDTO] = []) -> AsyncThrowingStream<String, Error> {
+    func stream(query: String, mode: String, kits: [Kit], history: [ConversationMessageDTO] = [], useRAG: Bool = true) -> AsyncThrowingStream<String, Error> {
         AsyncThrowingStream { continuation in
             Task {
                 do {
-                    let request = try buildRequest(query: query, mode: mode, kits: kits, history: history)
+                    let request = try buildRequest(query: query, mode: mode, kits: kits, history: history, useRAG: useRAG)
                     let (bytes, response) = try await URLSession.shared.bytes(for: request)
                     guard let http = response as? HTTPURLResponse, http.statusCode == 200 else {
                         continuation.finish(throwing: APIError.badResponse((response as? HTTPURLResponse)?.statusCode ?? 0))

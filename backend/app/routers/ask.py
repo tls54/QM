@@ -78,7 +78,7 @@ async def ask(request: AskRequest) -> StreamingResponse:
     if not request.query.strip():
         raise HTTPException(status_code=400, detail="Query must not be empty")
 
-    context_chunks = rag.retrieve(request.query)
+    context_chunks = rag.retrieve(request.query) if request.use_rag else []
     inventory_summary = _inventory_summary(request)
     system_prompt = _build_system_prompt(request.mode, context_chunks, inventory_summary)
     history = [{"role": m.role, "content": m.content} for m in request.history]

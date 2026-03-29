@@ -35,6 +35,7 @@ class AskRequest(BaseModel):
     mode: str = "ask"          # "ask" | "emergency"
     inventory: Optional[InventoryContext] = None
     history: list[ConversationMessage] = []
+    use_rag: bool = True       # set False to skip knowledge base retrieval
 
 
 class AskResponse(BaseModel):

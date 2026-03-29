@@ -6,7 +6,8 @@ import Foundation
     var mode: String
     var createdAt: Date
     var updatedAt: Date
-    @Relationship(deleteRule: .cascade) var messages: [PersistedMessage] = []
+    @Relationship(deleteRule: .cascade, inverse: \PersistedMessage.conversation)
+    var messages: [PersistedMessage] = []
 
     init(title: String, mode: String) {
         self.title = title
@@ -17,9 +18,10 @@ import Foundation
 }
 
 @Model final class PersistedMessage {
-    var role: String   // "user" | "assistant"
+    var role: String
     var content: String
     var timestamp: Date
+    var conversation: Conversation?
 
     init(role: String, content: String) {
         self.role = role

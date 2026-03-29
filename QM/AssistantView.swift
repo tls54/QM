@@ -13,6 +13,7 @@ struct AssistantView: View {
     @State private var error: String?
     @State private var mode: AssistantMode = .ask
     @State private var selectedKitIDs: Set<PersistentIdentifier> = []
+    @State private var useKnowledgeBase = true
     @State private var showingKitPicker = false
     @State private var showingHistory = false
     @State private var currentConversation: Conversation?
@@ -116,6 +117,14 @@ struct AssistantView: View {
                             .foregroundStyle(selectedKitIDs.isEmpty ? Color.secondary : Color.accentColor)
                     }
 
+                    Button {
+                        useKnowledgeBase.toggle()
+                    } label: {
+                        Image(systemName: useKnowledgeBase ? "book.fill" : "book")
+                            .font(.title3)
+                            .foregroundStyle(useKnowledgeBase ? Color.accentColor : Color.secondary)
+                    }
+
                     TextField(mode.placeholder, text: $input, axis: .vertical)
                         .lineLimit(1...4)
                         .padding(.horizontal, 12)
@@ -206,10 +215,11 @@ struct AssistantView: View {
         }
         let kitsSnapshot = contextKits
         let modeSnapshot = mode.rawValue
+        let useRAGSnapshot = useKnowledgeBase
 
         Task {
             do {
-                let stream = APIClient.shared.stream(query: query, mode: modeSnapshot, kits: kitsSnapshot, history: history)
+                let stream = APIClient.shared.stream(query: query, mode: modeSnapshot, kits: kitsSnapshot, history: history, useRAG: useRAGSnapshot)
                 for try await token in stream {
                     streamingContent += token
                 }

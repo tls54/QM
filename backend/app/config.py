@@ -16,8 +16,11 @@ class Settings(BaseSettings):
     # ── Groq credentials ──────────────────────────────────────────────────────
     groq_api_key: str
 
+    # ── Voyage AI (embeddings) ────────────────────────────────────────────────
+    voyage_api_key: str
+
     # ── Model selection ───────────────────────────────────────────────────────
-    # Primary: qwen/qwen3-32b (500k context, supports thinking)
+    # Primary: qwen/qwen3-32b (32k context on Groq)
     # Fallback: llama-3.3-70b-versatile (100k context)
     model: str = "qwen/qwen3-32b"
 
