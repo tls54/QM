@@ -47,8 +47,9 @@ struct AssistantView: View {
                         .padding(.horizontal)
                         .padding(.top, 8)
                     }
+                    .scrollDismissesKeyboard(.interactively)
                     .onChange(of: messages.count) {
-                        withAnimation { proxy.scrollTo(messages.last?.id ?? "typing", anchor: .bottom) }
+                        withAnimation { proxy.scrollTo(messages.last?.id as AnyHashable? ?? "typing" as AnyHashable, anchor: .bottom) }
                     }
                     .onChange(of: isLoading) {
                         if isLoading { withAnimation { proxy.scrollTo("typing", anchor: .bottom) } }
@@ -64,6 +65,14 @@ struct AssistantView: View {
                         .padding(.horizontal, 12)
                         .padding(.vertical, 8)
                         .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 20))
+                        .toolbar {
+                            ToolbarItemGroup(placement: .keyboard) {
+                                Spacer()
+                                Button("Done") {
+                                    UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+                                }
+                            }
+                        }
 
                     Button(action: send) {
                         Image(systemName: "arrow.up.circle.fill")
@@ -166,15 +175,32 @@ private struct ChatBubble: View {
 
     var isUser: Bool { message.role == .user }
 
+    private var assistantContent: some View {
+        let lines = message.content.components(separatedBy: "\n")
+        return VStack(alignment: .leading, spacing: 2) {
+            ForEach(Array(lines.enumerated()), id: \.offset) { _, line in
+                let attributed = (try? AttributedString(markdown: line)) ?? AttributedString(line)
+                Text(attributed)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+        }
+    }
+
     var body: some View {
         HStack {
             if isUser { Spacer(minLength: 48) }
-            Text(message.content)
-                .padding(.horizontal, 14)
-                .padding(.vertical, 10)
-                .background(isUser ? Color.accentColor : Color(.secondarySystemGroupedBackground),
-                            in: RoundedRectangle(cornerRadius: 18))
-                .foregroundStyle(isUser ? .white : .primary)
+            Group {
+                if isUser {
+                    Text(message.content)
+                } else {
+                    assistantContent
+                }
+            }
+            .padding(.horizontal, 14)
+            .padding(.vertical, 10)
+            .background(isUser ? Color.accentColor : Color(.secondarySystemGroupedBackground),
+                        in: RoundedRectangle(cornerRadius: 18))
+            .foregroundStyle(isUser ? .white : .primary)
             if !isUser { Spacer(minLength: 48) }
         }
     }

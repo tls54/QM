@@ -27,7 +27,7 @@ Core entities: Store inventory, First aid kits, Items (with quantity, expiry dat
 Extend the inventory model beyond first aid to general outdoor gear and kits.
 Same data model as Stream 1 — broader `ItemCategory` cases added: Navigation, Shelter, Cooking & Water, Lighting, Communication.
 
-### Stream 3 — AI Assistant (In Progress)
+### Stream 3 — AI Assistant (In Progress — chat UI live, RAG pending)
 Two UI modes, one knowledge base, one backend:
 
 **"Ask" mode — conversational AI**
