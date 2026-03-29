@@ -21,10 +21,16 @@ private struct InventoryContextDTO: Encodable {
     let kits: [KitDTO]
 }
 
+struct ConversationMessageDTO: Encodable {
+    let role: String
+    let content: String
+}
+
 private struct AskRequestDTO: Encodable {
     let query: String
     let mode: String
     let inventory: InventoryContextDTO?
+    let history: [ConversationMessageDTO]
 }
 
 struct AskResponseDTO: Decodable {
@@ -44,9 +50,13 @@ struct APIClient {
         return f
     }()
 
-    func ask(query: String, mode: String, kits: [Kit]) async throws -> AskResponseDTO {
+    func ask(query: String, mode: String, kits: [Kit], history: [ConversationMessageDTO] = []) async throws -> AskResponseDTO {
         let baseURL = UserDefaults.standard.string(forKey: "backendURL") ?? ""
+        let secretKey = UserDefaults.standard.string(forKey: "secretKey") ?? ""
         guard !baseURL.isEmpty, let url = URL(string: baseURL.trimmingCharacters(in: .whitespaces) + "/ask") else {
+            throw APIError.backendNotConfigured
+        }
+        guard !secretKey.isEmpty else {
             throw APIError.backendNotConfigured
         }
 
@@ -67,11 +77,12 @@ struct APIClient {
             )
         })
 
-        let body = AskRequestDTO(query: query, mode: mode, inventory: inventory)
+        let body = AskRequestDTO(query: query, mode: mode, inventory: inventory, history: history)
 
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue("Bearer \(secretKey)", forHTTPHeaderField: "Authorization")
         request.httpBody = try JSONEncoder().encode(body)
         request.timeoutInterval = 60
 
@@ -90,7 +101,7 @@ enum APIError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .backendNotConfigured:
-            return "Backend URL is not configured. Add it in Settings."
+            return "Backend URL and secret key are required. Add them in Settings."
         case .badResponse(let code):
             return "The server returned an unexpected response (HTTP \(code))."
         }

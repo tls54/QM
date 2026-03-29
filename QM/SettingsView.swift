@@ -6,6 +6,7 @@ struct SettingsView: View {
     @AppStorage("expiryWarningDays")    private var expiryWarningDays = 30
     @AppStorage("lowStockThreshold")    private var lowStockThreshold = 1
     @AppStorage("backendURL")           private var backendURL = ""
+    @AppStorage("secretKey")            private var secretKey = ""
 
     @Environment(\.modelContext) private var modelContext
     @Query private var kits: [Kit]
@@ -67,10 +68,13 @@ struct SettingsView: View {
                         .keyboardType(.URL)
                         .textInputAutocapitalization(.never)
                         .autocorrectionDisabled()
+                    SecureField("Secret key", text: $secretKey)
+                        .textInputAutocapitalization(.never)
+                        .autocorrectionDisabled()
                 } header: {
                     Text("Backend")
                 } footer: {
-                    Text("The URL of your deployed QM backend. Required for the AI Assistant.")
+                    Text("The URL and secret key for your deployed QM backend. Both are required for the AI Assistant.")
                 }
 
                 Section("About") {

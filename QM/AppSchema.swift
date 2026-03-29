@@ -17,11 +17,23 @@ enum SchemaV1: VersionedSchema {
     }
 }
 
+// MARK: - Schema V2
+// Adds Conversation and PersistedMessage for on-device chat history.
+
+enum SchemaV2: VersionedSchema {
+    static var versionIdentifier = Schema.Version(2, 0, 0)
+    static var models: [any PersistentModel.Type] {
+        [Kit.self, KitItem.self, Conversation.self, PersistedMessage.self]
+    }
+}
+
 // MARK: - Migration Plan
 
 enum AppMigrationPlan: SchemaMigrationPlan {
     static var schemas: [any VersionedSchema.Type] {
-        [SchemaV1.self]
+        [SchemaV1.self, SchemaV2.self]
     }
-    static var stages: [MigrationStage] { [] }
+    static var stages: [MigrationStage] {
+        [.lightweight(fromVersion: SchemaV1.self, toVersion: SchemaV2.self)]
+    }
 }

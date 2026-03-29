@@ -15,6 +15,7 @@ struct AddEditItemView: View {
     @State private var hasExpiry = false
     @State private var expiryDate = Calendar.current.date(byAdding: .year, value: 1, to: Date())!
     @State private var notes = ""
+    @State private var trackStock = true
     @State private var targetKit: Kit? = nil
 
     private var isEditing: Bool { item != nil }
@@ -34,6 +35,7 @@ struct AddEditItemView: View {
 
                 Section("Stock") {
                     Stepper("Quantity: \(quantity)", value: $quantity, in: 0...999)
+                    Toggle("Track stock level", isOn: $trackStock)
                 }
 
                 Section("Expiry") {
@@ -83,6 +85,7 @@ struct AddEditItemView: View {
         category = item.itemCategory
         quantity = item.quantity
         notes = item.notes
+        trackStock = item.trackStock
         if let expiry = item.expiryDate {
             hasExpiry = true
             expiryDate = expiry
@@ -99,6 +102,7 @@ struct AddEditItemView: View {
             item.quantity = quantity
             item.expiryDate = expiry
             item.notes = notes
+            item.trackStock = trackStock
 
             if let destination = targetKit {
                 kit.items.removeAll { $0.id == item.id }
@@ -110,7 +114,8 @@ struct AddEditItemView: View {
                 category: category,
                 quantity: quantity,
                 expiryDate: expiry,
-                notes: notes
+                notes: notes,
+                trackStock: trackStock
             )
             kit.items.append(newItem)
         }

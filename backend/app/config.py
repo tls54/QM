@@ -10,6 +10,9 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
+    # ── API security ──────────────────────────────────────────────────────────
+    secret_key: str  # Bearer token required on all protected endpoints
+
     # ── Groq credentials ──────────────────────────────────────────────────────
     groq_api_key: str
 

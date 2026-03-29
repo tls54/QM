@@ -9,13 +9,15 @@ final class KitItem {
     var quantity: Int
     var expiryDate: Date?
     var notes: String
+    var trackStock: Bool = true
 
-    init(name: String, category: ItemCategory, quantity: Int = 1, expiryDate: Date? = nil, notes: String = "") {
+    init(name: String, category: ItemCategory, quantity: Int = 1, expiryDate: Date? = nil, notes: String = "", trackStock: Bool = true) {
         self.name = name
         self.category = category.rawValue
         self.quantity = quantity
         self.expiryDate = expiryDate
         self.notes = notes
+        self.trackStock = trackStock
     }
 
     var itemCategory: ItemCategory {
@@ -32,6 +34,7 @@ final class KitItem {
     }
 
     var stockStatus: StockStatus {
+        guard trackStock else { return .ok }
         if quantity == 0 { return .outOfStock }
         let threshold = UserDefaults.standard.integer(forKey: "lowStockThreshold")
         return (threshold > 0 && quantity <= threshold) ? .low : .ok

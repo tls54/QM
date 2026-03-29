@@ -1,9 +1,10 @@
 import json
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
+from app.auth import require_auth
 from app.models.schemas import AskRequest, AskResponse
 from app.services import llm, rag
 
-router = APIRouter()
+router = APIRouter(dependencies=[Depends(require_auth)])
 
 
 def _inventory_summary(request: AskRequest) -> str:
@@ -67,7 +68,8 @@ async def ask(request: AskRequest) -> AskResponse:
     inventory_summary = _inventory_summary(request)
     system_prompt = _build_system_prompt(request.mode, context_chunks, inventory_summary)
 
-    answer = llm.chat(system_prompt=system_prompt, user_message=request.query)
+    history = [{"role": m.role, "content": m.content} for m in request.history]
+    answer = llm.chat(system_prompt=system_prompt, history=history, user_message=request.query)
 
     return AskResponse(
         answer=answer,

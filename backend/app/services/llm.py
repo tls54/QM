@@ -12,16 +12,17 @@ def get_client() -> Groq:
     return _client
 
 
-def chat(system_prompt: str, user_message: str) -> str:
+def chat(system_prompt: str, history: list[dict], user_message: str) -> str:
     settings = get_settings()
     client = get_client()
 
+    messages = [{"role": "system", "content": system_prompt}]
+    messages.extend(history)
+    messages.append({"role": "user", "content": user_message})
+
     kwargs: dict = dict(
         model=settings.model,
-        messages=[
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": user_message},
-        ],
+        messages=messages,
         max_tokens=settings.max_tokens,
         temperature=settings.temperature,
         top_p=settings.top_p,

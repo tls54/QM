@@ -11,7 +11,7 @@ import SwiftData
 @main
 struct QMApp: App {
     var sharedModelContainer: ModelContainer = {
-        let schema = Schema([Kit.self, KitItem.self])
+        let schema = Schema([Kit.self, KitItem.self, Conversation.self, PersistedMessage.self])
         let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
         do {
             return try ModelContainer(

@@ -3,11 +3,22 @@ import SwiftData
 
 struct AssistantView: View {
     @Query private var kits: [Kit]
+    @Query(sort: \Conversation.updatedAt, order: .reverse) private var conversations: [Conversation]
+    @Environment(\.modelContext) private var modelContext
+
     @State private var messages: [ChatMessage] = []
     @State private var input = ""
     @State private var isLoading = false
     @State private var error: String?
     @State private var mode: AssistantMode = .ask
+    @State private var selectedKitIDs: Set<PersistentIdentifier> = []
+    @State private var showingKitPicker = false
+    @State private var showingHistory = false
+    @State private var currentConversation: Conversation?
+
+    private var contextKits: [Kit] {
+        kits.filter { selectedKitIDs.contains($0.persistentModelID) }
+    }
 
     var body: some View {
         NavigationStack {
@@ -58,8 +69,45 @@ struct AssistantView: View {
 
                 Divider()
 
+                // Attached kit chips
+                if !selectedKitIDs.isEmpty {
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 6) {
+                            ForEach(contextKits) { kit in
+                                HStack(spacing: 4) {
+                                    Image(systemName: kit.kitIcon)
+                                        .font(.caption2)
+                                    Text(kit.name)
+                                        .font(.caption)
+                                    Button {
+                                        selectedKitIDs.remove(kit.persistentModelID)
+                                    } label: {
+                                        Image(systemName: "xmark")
+                                            .font(.caption2)
+                                    }
+                                }
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 4)
+                                .background(kit.iconColor.opacity(0.15), in: Capsule())
+                                .foregroundStyle(kit.iconColor)
+                            }
+                        }
+                        .padding(.horizontal)
+                    }
+                    .padding(.vertical, 6)
+                    .background(Color(.systemGroupedBackground))
+                }
+
                 // Input bar
-                HStack(spacing: 10) {
+                HStack(spacing: 8) {
+                    Button {
+                        showingKitPicker = true
+                    } label: {
+                        Image(systemName: selectedKitIDs.isEmpty ? "paperclip" : "paperclip.badge.ellipsis")
+                            .font(.title3)
+                            .foregroundStyle(selectedKitIDs.isEmpty ? Color.secondary : Color.accentColor)
+                    }
+
                     TextField(mode.placeholder, text: $input, axis: .vertical)
                         .lineLimit(1...4)
                         .padding(.horizontal, 12)
@@ -85,16 +133,32 @@ struct AssistantView: View {
                 .padding(.vertical, 10)
                 .background(Color(.systemGroupedBackground))
             }
-            .navigationTitle("Assistant")
+            .navigationTitle(currentConversation?.title ?? "Assistant")
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button {
+                        showingHistory = true
+                    } label: {
+                        Image(systemName: "clock.arrow.circlepath")
+                    }
+                }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     if !messages.isEmpty {
-                        Button("Clear") { messages = []; error = nil }
+                        Button("New Chat") { startNewChat() }
                     }
                 }
             }
+            .sheet(isPresented: $showingKitPicker) {
+                KitPickerSheet(kits: kits, selectedKitIDs: $selectedKitIDs)
+            }
+            .sheet(isPresented: $showingHistory) {
+                ChatHistorySheet(conversations: conversations, onLoad: loadConversation, onDelete: deleteConversation)
+            }
         }
     }
+
+    // MARK: - Empty state
 
     private var emptyState: some View {
         VStack(spacing: 12) {
@@ -110,22 +174,242 @@ struct AssistantView: View {
         .padding(.top, 60)
     }
 
+    // MARK: - Send
+
     private func send() {
         let query = input.trimmingCharacters(in: .whitespaces)
         guard !query.isEmpty else { return }
         input = ""
         error = nil
-        messages.append(ChatMessage(role: .user, content: query))
+
+        let userMessage = ChatMessage(role: .user, content: query)
+        messages.append(userMessage)
+        persistMessage(userMessage)
         isLoading = true
+
+        let history = messages.dropLast().map {
+            ConversationMessageDTO(role: $0.role == .user ? "user" : "assistant", content: $0.content)
+        }
 
         Task {
             do {
-                let response = try await APIClient.shared.ask(query: query, mode: mode.rawValue, kits: kits)
-                messages.append(ChatMessage(role: .assistant, content: response.answer))
+                let response = try await APIClient.shared.ask(query: query, mode: mode.rawValue, kits: contextKits, history: history)
+                let assistantMessage = ChatMessage(role: .assistant, content: response.answer)
+                messages.append(assistantMessage)
+                persistMessage(assistantMessage)
             } catch {
                 self.error = error.localizedDescription
             }
             isLoading = false
+        }
+    }
+
+    // MARK: - Persistence
+
+    private func persistMessage(_ message: ChatMessage) {
+        if currentConversation == nil {
+            let title = message.content.count > 40
+                ? String(message.content.prefix(40)) + "…"
+                : message.content
+            let conversation = Conversation(title: title, mode: mode.rawValue)
+            modelContext.insert(conversation)
+            currentConversation = conversation
+        }
+        guard let conversation = currentConversation else { return }
+        let persisted = PersistedMessage(
+            role: message.role == .user ? "user" : "assistant",
+            content: message.content
+        )
+        modelContext.insert(persisted)
+        conversation.messages.append(persisted)
+        conversation.updatedAt = Date()
+    }
+
+    // MARK: - History actions
+
+    private func startNewChat() {
+        messages = []
+        error = nil
+        currentConversation = nil
+        selectedKitIDs = []
+    }
+
+    private func loadConversation(_ conversation: Conversation) {
+        currentConversation = conversation
+        let sorted = conversation.messages.sorted { $0.timestamp < $1.timestamp }
+        messages = sorted.map {
+            ChatMessage(role: $0.role == "user" ? .user : .assistant, content: $0.content)
+        }
+        mode = AssistantMode(rawValue: conversation.mode) ?? .ask
+        showingHistory = false
+    }
+
+    private func deleteConversation(_ conversation: Conversation) {
+        if currentConversation?.persistentModelID == conversation.persistentModelID {
+            startNewChat()
+        }
+        modelContext.delete(conversation)
+    }
+}
+
+// MARK: - Chat history sheet
+
+private struct ChatHistorySheet: View {
+    let conversations: [Conversation]
+    let onLoad: (Conversation) -> Void
+    let onDelete: (Conversation) -> Void
+    @Environment(\.dismiss) private var dismiss
+
+    private let dateFormatter: RelativeDateTimeFormatter = {
+        let f = RelativeDateTimeFormatter()
+        f.unitsStyle = .abbreviated
+        return f
+    }()
+
+    var body: some View {
+        NavigationStack {
+            Group {
+                if conversations.isEmpty {
+                    ContentUnavailableView("No Chats Yet", systemImage: "bubble.left.and.bubble.right", description: Text("Your conversations will appear here."))
+                } else {
+                    List {
+                        ForEach(conversations) { conversation in
+                            Button {
+                                onLoad(conversation)
+                            } label: {
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text(conversation.title)
+                                        .foregroundStyle(.primary)
+                                        .lineLimit(1)
+                                    HStack(spacing: 8) {
+                                        Label(conversation.mode.capitalized, systemImage: conversation.mode == "emergency" ? "exclamationmark.triangle" : "bubble.left")
+                                            .font(.caption)
+                                            .foregroundStyle(.secondary)
+                                        Text("·")
+                                            .foregroundStyle(.secondary)
+                                            .font(.caption)
+                                        Text("\(conversation.messages.count) messages")
+                                            .font(.caption)
+                                            .foregroundStyle(.secondary)
+                                        Spacer()
+                                        Text(dateFormatter.localizedString(for: conversation.updatedAt, relativeTo: Date()))
+                                            .font(.caption)
+                                            .foregroundStyle(.secondary)
+                                    }
+                                }
+                            }
+                            .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                                Button(role: .destructive) {
+                                    onDelete(conversation)
+                                } label: {
+                                    Label("Delete", systemImage: "trash")
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            .navigationTitle("Chat History")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Done") { dismiss() }
+                }
+            }
+        }
+    }
+}
+
+// MARK: - Kit picker sheet
+
+private struct KitPickerSheet: View {
+    let kits: [Kit]
+    @Binding var selectedKitIDs: Set<PersistentIdentifier>
+    @Environment(\.dismiss) private var dismiss
+
+    private var allSelected: Bool {
+        kits.allSatisfy { selectedKitIDs.contains($0.persistentModelID) }
+    }
+
+    private var totalItems: Int {
+        kits.filter { selectedKitIDs.contains($0.persistentModelID) }.reduce(0) { $0 + $1.items.count }
+    }
+
+    var body: some View {
+        NavigationStack {
+            List {
+                Section {
+                    Button {
+                        if allSelected {
+                            selectedKitIDs.removeAll()
+                        } else {
+                            selectedKitIDs = Set(kits.map { $0.persistentModelID })
+                        }
+                    } label: {
+                        HStack {
+                            Label("All Kits", systemImage: "tray.full")
+                                .foregroundStyle(.primary)
+                            Spacer()
+                            if allSelected {
+                                Image(systemName: "checkmark")
+                                    .foregroundStyle(.accent)
+                            }
+                        }
+                    }
+                }
+
+                Section("Kits") {
+                    ForEach(kits) { kit in
+                        Button {
+                            if selectedKitIDs.contains(kit.persistentModelID) {
+                                selectedKitIDs.remove(kit.persistentModelID)
+                            } else {
+                                selectedKitIDs.insert(kit.persistentModelID)
+                            }
+                        } label: {
+                            HStack {
+                                Image(systemName: kit.kitIcon)
+                                    .foregroundStyle(kit.iconColor)
+                                    .frame(width: 24)
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text(kit.name)
+                                        .foregroundStyle(.primary)
+                                    if !kit.kitCategory.isEmpty {
+                                        Text(kit.kitCategory)
+                                            .font(.caption)
+                                            .foregroundStyle(.secondary)
+                                    }
+                                }
+                                Spacer()
+                                Text("\(kit.items.count) items")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                                if selectedKitIDs.contains(kit.persistentModelID) {
+                                    Image(systemName: "checkmark")
+                                        .foregroundStyle(.accent)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            .navigationTitle("Attach Kits")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Done") { dismiss() }
+                }
+            }
+            .safeAreaInset(edge: .bottom) {
+                if totalItems > 0 {
+                    Text("\(totalItems) items across \(selectedKitIDs.count) kit\(selectedKitIDs.count == 1 ? "" : "s") attached")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .padding(.vertical, 8)
+                        .frame(maxWidth: .infinity)
+                        .background(Color(.systemGroupedBackground))
+                }
+            }
         }
     }
 }

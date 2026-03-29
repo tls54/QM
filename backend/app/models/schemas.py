@@ -25,10 +25,16 @@ class InventoryContext(BaseModel):
 
 # ── Ask endpoint ──────────────────────────────────────────────────────────────
 
+class ConversationMessage(BaseModel):
+    role: str      # "user" | "assistant"
+    content: str
+
+
 class AskRequest(BaseModel):
     query: str
     mode: str = "ask"          # "ask" | "emergency"
     inventory: Optional[InventoryContext] = None
+    history: list[ConversationMessage] = []
 
 
 class AskResponse(BaseModel):
