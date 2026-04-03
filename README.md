@@ -75,32 +75,36 @@ The API will be available at `http://localhost:8000`.
 
 **Configuration**
 
-All config is driven by environment variables. Only `GROQ_API_KEY` is required — everything else has defaults.
+All config is driven by environment variables. See `.env.example` for the full list.
 
 | Variable | Default | Description |
 |----------|---------|-------------|
+| `SECRET_KEY` | — | Required. Bearer token used by the iOS app to authenticate requests. |
 | `GROQ_API_KEY` | — | Required. Your Groq API key. |
+| `VOYAGE_API_KEY` | — | Required. Your Voyage AI key for query embeddings. |
 | `MODEL` | `qwen/qwen3-32b` | LLM model to use |
 | `MAX_TOKENS` | `2048` | Maximum tokens in response |
 | `TEMPERATURE` | `0.7` | Sampling temperature (0.0–2.0) |
 | `TOP_P` | `1.0` | Nucleus sampling |
 | `REASONING_EFFORT` | unset | Thinking level for supported models: `none`, `default`, `turbo` |
 
-For production deployment, set these as environment variables in your host rather than using a `.env` file. The backend is currently deployed on Railway — configure the public URL in the iOS app under **Settings → Backend**.
+For production deployment, set these as environment variables in Railway rather than using a `.env` file. Configure the public URL and secret key in the iOS app under **Settings → Backend**.
 
 **Architecture**
-- FastAPI + Uvicorn
-- Groq API for LLM inference (primary: `qwen/qwen3-32b`, 500k context)
-- RAG pipeline over a first aid knowledge base (in progress — `services/rag.py`)
-- Inventory is sent per-request as JSON — no shared database between app and backend
+- FastAPI + Uvicorn, deployed on Railway
+- Groq API for LLM inference (`qwen/qwen3-32b`, streamed via SSE)
+- RAG pipeline: Voyage AI (`voyage-4`) for query embeddings, Chroma for vector search (46 chunks, St John Ambulance First Aid Reference Guide)
+- Chroma index ships baked into the Docker image (`backend/chroma_db/`)
+- Bearer token auth on all `/ask` requests
+- Inventory sent per-request as JSON — no shared database between app and backend
 
 ---
 
 ## AI modes (Stream 3)
 
-**Ask mode** — conversational interface for planning and advice. Inventory context and RAG-retrieved knowledge base chunks are injected into each request.
+**Ask mode** — conversational interface for planning and advice. Supports multi-turn conversation history, selective kit attachment, on-device chat history, and a toggleable first aid knowledge base (book icon). Responses stream token-by-token.
 
-**Emergency mode** — fast, tap-based interface designed for in-situation use. User selects an injury or scenario and gets a clean numbered protocol with relevant inventory items surfaced inline (have ✓ / missing ✗). Designed to be usable under stress, no typing required.
+**Emergency mode** — fast, tap-based interface designed for in-situation use. User selects an injury or scenario and gets a clean numbered protocol with relevant inventory items surfaced inline (have ✓ / missing ✗). Designed to be usable under stress, no typing required. (UI in progress.)
 
 ---
 
