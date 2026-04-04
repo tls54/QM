@@ -7,9 +7,13 @@ struct KitDetailView: View {
     @State private var showingAddItem = false
     @State private var showingEditKit = false
     @State private var editingItem: KitItem?
+    @State private var filterExpiring = false
 
     private var itemsByCategory: [(ItemCategory, [KitItem])] {
-        let grouped = Dictionary(grouping: kit.sortedItems, by: { $0.itemCategory })
+        let source = filterExpiring
+            ? kit.sortedItems.filter { $0.expiryStatus == .expired || $0.expiryStatus == .expiringSoon }
+            : kit.sortedItems
+        let grouped = Dictionary(grouping: source, by: { $0.itemCategory })
         return ItemCategory.allCases.compactMap { category in
             guard let items = grouped[category], !items.isEmpty else { return nil }
             return (category, items)
@@ -28,9 +32,12 @@ struct KitDetailView: View {
                 ForEach(itemsByCategory, id: \.0) { category, items in
                     Section {
                         ForEach(items) { item in
-                            KitItemRowView(item: item)
-                                .contentShape(Rectangle())
-                                .onTapGesture { editingItem = item }
+                            KitItemRowView(item: item, onAdjust: { delta in
+                                item.quantity = max(0, item.quantity + delta)
+                                try? modelContext.save()
+                            })
+                            .contentShape(Rectangle())
+                            .onTapGesture { editingItem = item }
                         }
                         .onDelete { offsets in
                             deleteItems(from: items, offsets: offsets)
@@ -46,6 +53,10 @@ struct KitDetailView: View {
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 HStack {
+                    Button(action: { filterExpiring.toggle() }) {
+                        Image(systemName: filterExpiring ? "clock.fill" : "clock")
+                            .foregroundStyle(filterExpiring ? .orange : .primary)
+                    }
                     Button(action: { showingEditKit = true }) {
                         Image(systemName: "pencil")
                     }
@@ -76,6 +87,7 @@ struct KitDetailView: View {
 
 private struct KitItemRowView: View {
     let item: KitItem
+    let onAdjust: (Int) -> Void
 
     var body: some View {
         HStack(spacing: 12) {
@@ -89,6 +101,12 @@ private struct KitItemRowView: View {
                         .foregroundStyle(item.expiryStatus.color)
                 }
 
+                if let size = item.size, !size.isEmpty {
+                    Text(size)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+
                 if !item.notes.isEmpty {
                     Text(item.notes)
                         .font(.caption)
@@ -99,7 +117,16 @@ private struct KitItemRowView: View {
 
             Spacer()
 
-            HStack(spacing: 6) {
+            HStack(spacing: 4) {
+                Button {
+                    onAdjust(-1)
+                } label: {
+                    Image(systemName: "minus.circle")
+                        .foregroundStyle(item.quantity > 0 ? .secondary : Color.secondary.opacity(0.3))
+                }
+                .buttonStyle(.plain)
+                .disabled(item.quantity == 0)
+
                 if item.stockStatus != .ok {
                     Text(item.stockStatus.label)
                         .font(.caption)
@@ -111,7 +138,16 @@ private struct KitItemRowView: View {
                     Text("×\(item.quantity)")
                         .font(.callout)
                         .foregroundStyle(.secondary)
+                        .frame(minWidth: 28, alignment: .center)
                 }
+
+                Button {
+                    onAdjust(1)
+                } label: {
+                    Image(systemName: "plus.circle")
+                        .foregroundStyle(.secondary)
+                }
+                .buttonStyle(.plain)
 
                 if item.expiryStatus == .expiringSoon || item.expiryStatus == .expired {
                     Image(systemName: item.expiryStatus.icon)

@@ -1,3 +1,4 @@
+from datetime import date
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import StreamingResponse
 from app.auth import require_auth
@@ -33,6 +34,8 @@ def _build_system_prompt(mode: str, context_chunks: list[str], inventory_summary
 
     base = f"""You are QM, an AI assistant specialising in first aid kit management and outdoor preparedness.
 You have access to the user's current inventory and a first aid knowledge base.
+
+Today's date: {date.today().isoformat()}
 
 ## User's Inventory
 {inventory_summary}

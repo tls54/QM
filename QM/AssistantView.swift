@@ -130,14 +130,6 @@ struct AssistantView: View {
                         .padding(.horizontal, 12)
                         .padding(.vertical, 8)
                         .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 20))
-                        .toolbar {
-                            ToolbarItemGroup(placement: .keyboard) {
-                                Spacer()
-                                Button("Done") {
-                                    UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
-                                }
-                            }
-                        }
 
                     Button(action: send) {
                         Image(systemName: "arrow.up.circle.fill")
@@ -567,6 +559,13 @@ private struct ChatBubble: View {
             .background(isUser ? Color.accentColor : Color(.secondarySystemGroupedBackground),
                         in: RoundedRectangle(cornerRadius: 18))
             .foregroundStyle(isUser ? .white : .primary)
+            .contextMenu {
+                Button {
+                    UIPasteboard.general.string = message.content
+                } label: {
+                    Label("Copy", systemImage: "doc.on.doc")
+                }
+            }
             if !isUser { Spacer(minLength: 48) }
         }
     }

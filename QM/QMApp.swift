@@ -14,11 +14,7 @@ struct QMApp: App {
         let schema = Schema([Kit.self, KitItem.self, Conversation.self, PersistedMessage.self])
         let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
         do {
-            return try ModelContainer(
-                for: schema,
-                migrationPlan: AppMigrationPlan.self,
-                configurations: [config]
-            )
+            return try ModelContainer(for: schema, configurations: [config])
         } catch {
             fatalError("Could not create ModelContainer: \(error)")
         }

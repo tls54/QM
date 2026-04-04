@@ -10,14 +10,16 @@ final class KitItem {
     var expiryDate: Date?
     var notes: String
     var trackStock: Bool = true
+    var size: String?
 
-    init(name: String, category: ItemCategory, quantity: Int = 1, expiryDate: Date? = nil, notes: String = "", trackStock: Bool = true) {
+    init(name: String, category: ItemCategory, quantity: Int = 1, expiryDate: Date? = nil, notes: String = "", trackStock: Bool = true, size: String? = nil) {
         self.name = name
         self.category = category.rawValue
         self.quantity = quantity
         self.expiryDate = expiryDate
         self.notes = notes
         self.trackStock = trackStock
+        self.size = size
     }
 
     var itemCategory: ItemCategory {

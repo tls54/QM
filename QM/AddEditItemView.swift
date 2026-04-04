@@ -12,6 +12,7 @@ struct AddEditItemView: View {
     @State private var name = ""
     @State private var category: ItemCategory = .other
     @State private var quantity = 1
+    @State private var size = ""
     @State private var hasExpiry = false
     @State private var expiryDate = Calendar.current.date(byAdding: .year, value: 1, to: Date())!
     @State private var notes = ""
@@ -35,6 +36,7 @@ struct AddEditItemView: View {
 
                 Section("Stock") {
                     Stepper("Quantity: \(quantity)", value: $quantity, in: 0...999)
+                    TextField("Size (optional, e.g. 5cm, Large)", text: $size)
                     Toggle("Track stock level", isOn: $trackStock)
                 }
 
@@ -84,6 +86,7 @@ struct AddEditItemView: View {
         name = item.name
         category = item.itemCategory
         quantity = item.quantity
+        size = item.size ?? ""
         notes = item.notes
         trackStock = item.trackStock
         if let expiry = item.expiryDate {
@@ -100,6 +103,7 @@ struct AddEditItemView: View {
             item.name = trimmed
             item.category = category.rawValue
             item.quantity = quantity
+            item.size = size.trimmingCharacters(in: .whitespaces).isEmpty ? nil : size.trimmingCharacters(in: .whitespaces)
             item.expiryDate = expiry
             item.notes = notes
             item.trackStock = trackStock
@@ -115,7 +119,8 @@ struct AddEditItemView: View {
                 quantity: quantity,
                 expiryDate: expiry,
                 notes: notes,
-                trackStock: trackStock
+                trackStock: trackStock,
+                size: size.trimmingCharacters(in: .whitespaces).isEmpty ? nil : size.trimmingCharacters(in: .whitespaces)
             )
             kit.items.append(newItem)
         }
