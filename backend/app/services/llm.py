@@ -44,4 +44,4 @@ def stream(system_prompt: str, history: list[dict], user_message: str, model: st
         kwargs["model"] = model
         kwargs.pop("reasoning_effort", None)
     kwargs["stream"] = True
-    return client.chat.completions.create(**kwargs)
+    return client.chat.completions.create(**kwargs, timeout=25)

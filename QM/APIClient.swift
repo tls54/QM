@@ -115,7 +115,7 @@ struct APIClient {
 
     func stream(query: String, mode: String, kits: [Kit], history: [ConversationMessageDTO] = [], useRAG: Bool = true) -> AsyncThrowingStream<String, Error> {
         AsyncThrowingStream { continuation in
-            Task {
+            let streamTask = Task {
                 do {
                     let request = try buildRequest(query: query, mode: mode, kits: kits, history: history, useRAG: useRAG)
                     let (bytes, response) = try await URLSession.shared.bytes(for: request)
@@ -127,7 +127,6 @@ struct APIClient {
                         guard line.hasPrefix("data: ") else { continue }
                         let payload = String(line.dropFirst(6))
                         if payload == "[DONE]" { break }
-                        // Unescape newlines encoded by the backend
                         continuation.yield(payload.replacingOccurrences(of: "\\n", with: "\n"))
                     }
                     continuation.finish()
@@ -135,6 +134,15 @@ struct APIClient {
                     continuation.finish(throwing: error)
                 }
             }
+
+            Task {
+                try? await Task.sleep(for: .seconds(30))
+                guard !streamTask.isCancelled else { return }
+                streamTask.cancel()
+                continuation.finish(throwing: APIError.timeout)
+            }
+
+            continuation.onTermination = { _ in streamTask.cancel() }
         }
     }
 }
@@ -142,6 +150,7 @@ struct APIClient {
 enum APIError: LocalizedError {
     case backendNotConfigured
     case badResponse(Int)
+    case timeout
 
     var errorDescription: String? {
         switch self {
@@ -149,6 +158,8 @@ enum APIError: LocalizedError {
             return "Backend URL and secret key are required. Add them in Settings."
         case .badResponse(let code):
             return "The server returned an unexpected response (HTTP \(code))."
+        case .timeout:
+            return "The request timed out. Check your connection and try again."
         }
     }
 }
