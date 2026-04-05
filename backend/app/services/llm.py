@@ -39,6 +39,9 @@ def stream(system_prompt: str, history: list[dict], user_message: str, model: st
     messages = _build_messages(system_prompt, history, user_message)
     kwargs = _base_kwargs(messages)
     if model:
+        # User-selected model override — use it and drop reasoning_effort since
+        # that parameter is only supported by specific models.
         kwargs["model"] = model
+        kwargs.pop("reasoning_effort", None)
     kwargs["stream"] = True
     return client.chat.completions.create(**kwargs)
