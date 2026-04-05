@@ -33,10 +33,12 @@ def _base_kwargs(messages: list[dict]) -> dict:
     return kwargs
 
 
-def stream(system_prompt: str, history: list[dict], user_message: str):
+def stream(system_prompt: str, history: list[dict], user_message: str, model: str | None = None):
     """Return a Groq streaming completion iterator."""
     client = get_client()
     messages = _build_messages(system_prompt, history, user_message)
     kwargs = _base_kwargs(messages)
+    if model:
+        kwargs["model"] = model
     kwargs["stream"] = True
     return client.chat.completions.create(**kwargs)

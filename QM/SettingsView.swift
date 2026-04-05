@@ -7,10 +7,14 @@ struct SettingsView: View {
     @AppStorage("lowStockThreshold")    private var lowStockThreshold = 1
     @AppStorage("backendURL")           private var backendURL = ""
     @AppStorage("secretKey")            private var secretKey = ""
+    @AppStorage("selectedModel")        private var selectedModel = ""
 
     @Environment(\.modelContext) private var modelContext
     @Query private var kits: [Kit]
     @State private var showingClearConfirmation = false
+    @State private var availableModels: [GroqModel] = []
+    @State private var modelsLoading = false
+    @State private var modelsError: String?
 
     private var appVersion: String {
         Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "—"
@@ -77,6 +81,41 @@ struct SettingsView: View {
                     Text("The URL and secret key for your deployed QM backend. Both are required for the AI Assistant.")
                 }
 
+                Section {
+                    if modelsLoading {
+                        HStack {
+                            ProgressView()
+                            Text("Loading models…")
+                                .foregroundStyle(.secondary)
+                        }
+                    } else if availableModels.isEmpty {
+                        Button("Load Available Models") { fetchModels() }
+                            .disabled(backendURL.isEmpty || secretKey.isEmpty)
+                    } else {
+                        Picker("Model", selection: $selectedModel) {
+                            Text("Server default").tag("")
+                            ForEach(availableModels) { model in
+                                Text(model.id).tag(model.id)
+                            }
+                        }
+                        .pickerStyle(.navigationLink)
+                        Button("Refresh") { fetchModels() }
+                            .foregroundStyle(.secondary)
+                    }
+                    if let error = modelsError {
+                        Text(error)
+                            .font(.caption)
+                            .foregroundStyle(.red)
+                    }
+                } header: {
+                    Text("AI Model")
+                } footer: {
+                    Text(selectedModel.isEmpty
+                         ? "Using server default model (qwen/qwen3-32b). Load models to override."
+                         : "Using \(selectedModel). Select \"Server default\" to revert."
+                    )
+                }
+
                 Section("About") {
                     HStack {
                         Text("Version")
@@ -109,5 +148,24 @@ struct SettingsView: View {
     private func clearAllData() {
         kits.forEach { modelContext.delete($0) }
         modelContext.insert(Kit(name: "Store", isStore: true))
+    }
+
+    private func fetchModels() {
+        modelsLoading = true
+        modelsError = nil
+        Task {
+            do {
+                let models = try await APIClient.shared.fetchModels()
+                await MainActor.run {
+                    availableModels = models
+                    modelsLoading = false
+                }
+            } catch {
+                await MainActor.run {
+                    modelsError = error.localizedDescription
+                    modelsLoading = false
+                }
+            }
+        }
     }
 }

@@ -6,6 +6,8 @@ struct AssistantView: View {
     @Query(sort: \Conversation.updatedAt, order: .reverse) private var conversations: [Conversation]
     @Environment(\.modelContext) private var modelContext
 
+    @AppStorage("hasAcknowledgedAIDisclaimer") private var hasAcknowledgedDisclaimer = false
+
     @State private var messages: [ChatMessage] = []
     @State private var input = ""
     @State private var isLoading = false
@@ -141,6 +143,13 @@ struct AssistantView: View {
                 .padding(.horizontal)
                 .padding(.vertical, 10)
                 .background(Color(.systemGroupedBackground))
+
+                Text("QM can make mistakes. Not a substitute for medical training or professional advice.")
+                    .font(.caption2)
+                    .foregroundStyle(.tertiary)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal)
+                    .padding(.bottom, 4)
             }
             .navigationTitle(currentConversation?.title ?? "Assistant")
             .navigationBarTitleDisplayMode(.inline)
@@ -168,6 +177,14 @@ struct AssistantView: View {
                     onDelete: deleteConversation,
                     onRename: renameConversation
                 )
+            }
+            .sheet(isPresented: Binding(
+                get: { !hasAcknowledgedDisclaimer },
+                set: { if !$0 { hasAcknowledgedDisclaimer = true } }
+            )) {
+                AIDisclaimerSheet {
+                    hasAcknowledgedDisclaimer = true
+                }
             }
         }
     }
@@ -527,6 +544,55 @@ struct ChatMessage: Identifiable {
 }
 
 // MARK: - Sub-views
+
+private struct AIDisclaimerSheet: View {
+    let onAcknowledge: () -> Void
+
+    var body: some View {
+        VStack(spacing: 24) {
+            Spacer()
+
+            Image(systemName: "exclamationmark.triangle.fill")
+                .font(.system(size: 48))
+                .foregroundStyle(.orange)
+
+            VStack(spacing: 12) {
+                Text("AI Assistant — Important Notice")
+                    .font(.title2.bold())
+                    .multilineTextAlignment(.center)
+
+                Text("QM's AI assistant can make mistakes. Responses may be incomplete, incorrect, or not applicable to your specific situation.")
+                    .font(.body)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+
+                Text("This assistant is not a substitute for professional medical training, qualified first aid guidance, or emergency services.")
+                    .font(.body)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+
+                Text("In a life-threatening emergency, always call the emergency services first.")
+                    .font(.callout.bold())
+                    .multilineTextAlignment(.center)
+            }
+
+            Spacer()
+
+            Button(action: onAcknowledge) {
+                Text("I Understand")
+                    .font(.body.bold())
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color.accentColor, in: RoundedRectangle(cornerRadius: 14))
+                    .foregroundStyle(.white)
+            }
+            .padding(.horizontal)
+            .padding(.bottom)
+        }
+        .padding(.horizontal, 24)
+        .interactiveDismissDisabled()
+    }
+}
 
 private struct ChatBubble: View {
     let message: ChatMessage

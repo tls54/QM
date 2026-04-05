@@ -86,6 +86,6 @@ async def ask(request: AskRequest) -> StreamingResponse:
     system_prompt = _build_system_prompt(request.mode, context_chunks, inventory_summary)
     history = [{"role": m.role, "content": m.content} for m in request.history]
 
-    chunks = llm.stream(system_prompt=system_prompt, history=history, user_message=request.query)
+    chunks = llm.stream(system_prompt=system_prompt, history=history, user_message=request.query, model=request.model)
 
     return StreamingResponse(_sse_generator(chunks), media_type="text/event-stream")

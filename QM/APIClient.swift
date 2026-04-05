@@ -32,6 +32,12 @@ private struct AskRequestDTO: Encodable {
     let inventory: InventoryContextDTO?
     let history: [ConversationMessageDTO]
     let use_rag: Bool
+    let model: String?
+}
+
+struct GroqModel: Decodable, Identifiable, Hashable {
+    let id: String
+    let owned_by: String
 }
 
 // MARK: - Client
@@ -47,15 +53,22 @@ struct APIClient {
 
     // MARK: - Request builder
 
+    private func baseURL() throws -> String {
+        let url = UserDefaults.standard.string(forKey: "backendURL") ?? ""
+        guard !url.isEmpty else { throw APIError.backendNotConfigured }
+        return url.trimmingCharacters(in: .whitespaces)
+    }
+
+    private func secretKey() throws -> String {
+        let key = UserDefaults.standard.string(forKey: "secretKey") ?? ""
+        guard !key.isEmpty else { throw APIError.backendNotConfigured }
+        return key
+    }
+
     private func buildRequest(query: String, mode: String, kits: [Kit], history: [ConversationMessageDTO], useRAG: Bool = true) throws -> URLRequest {
-        let baseURL = UserDefaults.standard.string(forKey: "backendURL") ?? ""
-        let secretKey = UserDefaults.standard.string(forKey: "secretKey") ?? ""
-        guard !baseURL.isEmpty, let url = URL(string: baseURL.trimmingCharacters(in: .whitespaces) + "/ask") else {
-            throw APIError.backendNotConfigured
-        }
-        guard !secretKey.isEmpty else {
-            throw APIError.backendNotConfigured
-        }
+        let base = try baseURL()
+        let key = try secretKey()
+        guard let url = URL(string: base + "/ask") else { throw APIError.backendNotConfigured }
 
         let inventory = InventoryContextDTO(kits: kits.map { kit in
             KitDTO(
@@ -74,15 +87,28 @@ struct APIClient {
             )
         })
 
-        let body = AskRequestDTO(query: query, mode: mode, inventory: inventory, history: history, use_rag: useRAG)
+        let selectedModel = UserDefaults.standard.string(forKey: "selectedModel")
+        let body = AskRequestDTO(query: query, mode: mode, inventory: inventory, history: history, use_rag: useRAG, model: selectedModel)
 
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.setValue("Bearer \(secretKey)", forHTTPHeaderField: "Authorization")
+        request.setValue("Bearer \(key)", forHTTPHeaderField: "Authorization")
         request.httpBody = try JSONEncoder().encode(body)
         request.timeoutInterval = 60
         return request
+    }
+
+    // MARK: - Models
+
+    func fetchModels() async throws -> [GroqModel] {
+        let base = try baseURL()
+        let key = try secretKey()
+        guard let url = URL(string: base + "/models") else { throw APIError.backendNotConfigured }
+        var request = URLRequest(url: url)
+        request.setValue("Bearer \(key)", forHTTPHeaderField: "Authorization")
+        let (data, _) = try await URLSession.shared.data(for: request)
+        return try JSONDecoder().decode([GroqModel].self, from: data)
     }
 
     // MARK: - Streaming

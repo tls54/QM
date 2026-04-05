@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from app.routers import health, ask
+from app.routers import health, ask, models
 
 app = FastAPI(
     title="QM Backend",
@@ -9,3 +9,4 @@ app = FastAPI(
 
 app.include_router(health.router)
 app.include_router(ask.router)
+app.include_router(models.router)
