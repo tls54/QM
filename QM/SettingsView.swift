@@ -8,6 +8,7 @@ struct SettingsView: View {
     @AppStorage("backendURL")           private var backendURL = ""
     @AppStorage("secretKey")            private var secretKey = ""
     @AppStorage("selectedModel")        private var selectedModel = ""
+    @AppStorage("medicalFeaturesEnabled") private var medicalFeaturesEnabled = false
 
     @Environment(\.modelContext) private var modelContext
     @Query private var kits: [Kit]
@@ -114,6 +115,14 @@ struct SettingsView: View {
                          ? "Using server default model (qwen/qwen3-32b). Load models to override."
                          : "Using \(selectedModel). Select \"Server default\" to revert."
                     )
+                }
+
+                Section {
+                    Toggle("Medical Knowledge Features", isOn: $medicalFeaturesEnabled)
+                } header: {
+                    Text("Advanced")
+                } footer: {
+                    Text("Enables the Guide tab and on-device first aid search. Content is sourced from the St John Ambulance First Aid Reference Guide and is for personal use only — not for redistribution.")
                 }
 
                 Section("About") {

@@ -105,7 +105,19 @@ For production deployment, set these as environment variables in Railway rather 
 
 **Ask mode** — conversational interface for planning and advice. Supports multi-turn conversation history, selective kit attachment, on-device chat history, toggleable first aid knowledge base, long-press to copy, and token-by-token streaming. Includes an AI disclaimer on first use and a persistent footer. Model can be overridden per-device in Settings.
 
-**Emergency mode** — fast, tap-based interface designed for in-situation use. User selects an injury or scenario and gets a clean numbered protocol with relevant inventory items surfaced inline (have ✓ / missing ✗). Designed to be usable under stress, no typing required. (In progress.)
+**Search mode** — on-device semantic search over the first aid knowledge base using `NLContextualEmbedding`. Embeddings are built on first use and cached to disk. Results link to full condition detail views with structured Recognition and Treatment sections. Gated behind the Advanced toggle (see below).
+
+**Guide tab** — browse and search the St John Ambulance First Aid Reference Guide by category, fully offline. Gated behind the Advanced toggle.
+
+The **knowledge base toggle** (book icon) in Ask mode is also gated — when the Advanced toggle is off, the RAG pipeline is disabled and no SJA content is used at any point.
+
+---
+
+## Medical knowledge features
+
+The Guide tab and Search mode are powered by content from the **St John Ambulance First Aid Reference Guide** (UK).
+
+> **Personal use only.** This content is used under St John Ambulance's personal use terms and is not licensed for redistribution. These features are disabled by default and must be explicitly enabled in **Settings → Advanced → Medical Knowledge Features**. Do not enable this flag in any build intended for distribution until a redistribution licence has been obtained or the content has been replaced with original material.
 
 ---
 

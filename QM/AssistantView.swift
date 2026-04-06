@@ -7,6 +7,7 @@ struct AssistantView: View {
     @Environment(\.modelContext) private var modelContext
 
     @AppStorage("hasAcknowledgedAIDisclaimer") private var hasAcknowledgedDisclaimer = false
+    @AppStorage("medicalFeaturesEnabled") private var medicalFeaturesEnabled = false
 
     @State private var messages: [ChatMessage] = []
     @State private var input = ""
@@ -29,14 +30,21 @@ struct AssistantView: View {
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
-                // Mode picker
+                // Mode picker — Search only shown when medical features are enabled
+                let availableModes = AssistantMode.allCases.filter { $0 != .search || medicalFeaturesEnabled }
                 Picker("Mode", selection: $mode) {
-                    ForEach(AssistantMode.allCases) { m in
+                    ForEach(availableModes) { m in
                         Text(m.label).tag(m)
                     }
                 }
                 .pickerStyle(.segmented)
                 .padding()
+                .onChange(of: medicalFeaturesEnabled) {
+                    if !medicalFeaturesEnabled {
+                        if mode == .search { mode = .ask }
+                        useKnowledgeBase = false
+                    }
+                }
 
                 // Content area — chat or search results
                 if mode == .search {
@@ -125,12 +133,14 @@ struct AssistantView: View {
                                 .foregroundStyle(selectedKitIDs.isEmpty ? Color.secondary : Color.accentColor)
                         }
 
-                        Button {
-                            useKnowledgeBase.toggle()
-                        } label: {
-                            Image(systemName: useKnowledgeBase ? "book.fill" : "book")
-                                .font(.title3)
-                                .foregroundStyle(useKnowledgeBase ? Color.accentColor : Color.secondary)
+                        if medicalFeaturesEnabled {
+                            Button {
+                                useKnowledgeBase.toggle()
+                            } label: {
+                                Image(systemName: useKnowledgeBase ? "book.fill" : "book")
+                                    .font(.title3)
+                                    .foregroundStyle(useKnowledgeBase ? Color.accentColor : Color.secondary)
+                            }
                         }
                     }
 

@@ -9,7 +9,8 @@ import SwiftUI
 import SwiftData
 
 struct ContentView: View {
-    @AppStorage("appearancePreference") private var appearancePreference = "system"
+    @AppStorage("appearancePreference")   private var appearancePreference = "system"
+    @AppStorage("medicalFeaturesEnabled") private var medicalFeaturesEnabled = false
 
     private var preferredColorScheme: ColorScheme? {
         switch appearancePreference {
@@ -27,8 +28,10 @@ struct ContentView: View {
             Tab("Inventory", systemImage: "list.clipboard") {
                 InventoryView()
             }
-            Tab("Guide", systemImage: "book.closed") {
-                ReferenceView()
+            if medicalFeaturesEnabled {
+                Tab("Guide", systemImage: "book.closed") {
+                    ReferenceView()
+                }
             }
             Tab("Assistant", systemImage: "bubble.left.and.bubble.right") {
                 AssistantView()
