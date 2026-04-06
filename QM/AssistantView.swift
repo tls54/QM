@@ -19,6 +19,8 @@ struct AssistantView: View {
     @State private var showingKitPicker = false
     @State private var showingHistory = false
     @State private var currentConversation: Conversation?
+    @State private var searchResults: [FirstAidChunk] = []
+    @State private var hasSearched = false
 
     private var contextKits: [Kit] {
         kits.filter { selectedKitIDs.contains($0.persistentModelID) }
@@ -36,52 +38,55 @@ struct AssistantView: View {
                 .pickerStyle(.segmented)
                 .padding()
 
-                // Messages
-                ScrollViewReader { proxy in
-                    ScrollView {
-                        LazyVStack(alignment: .leading, spacing: 12) {
-                            if messages.isEmpty && !isLoading {
-                                emptyState
+                // Content area — chat or search results
+                if mode == .search {
+                    searchResultsView
+                } else {
+                    ScrollViewReader { proxy in
+                        ScrollView {
+                            LazyVStack(alignment: .leading, spacing: 12) {
+                                if messages.isEmpty && !isLoading {
+                                    emptyState
+                                }
+                                ForEach(messages) { message in
+                                    ChatBubble(message: message)
+                                        .id(message.id)
+                                }
+                                if isLoading && !streamingContent.isEmpty {
+                                    ChatBubble(message: ChatMessage(role: .assistant, content: streamingContent))
+                                        .id("streaming")
+                                } else if isLoading {
+                                    TypingIndicator()
+                                        .id("typing")
+                                }
+                                if let error {
+                                    Text(error)
+                                        .font(.caption)
+                                        .foregroundStyle(.red)
+                                        .padding(.horizontal)
+                                        .id("error")
+                                }
                             }
-                            ForEach(messages) { message in
-                                ChatBubble(message: message)
-                                    .id(message.id)
-                            }
-                            // Streaming bubble — shows tokens as they arrive
-                            if isLoading && !streamingContent.isEmpty {
-                                ChatBubble(message: ChatMessage(role: .assistant, content: streamingContent))
-                                    .id("streaming")
-                            } else if isLoading {
-                                TypingIndicator()
-                                    .id("typing")
-                            }
-                            if let error {
-                                Text(error)
-                                    .font(.caption)
-                                    .foregroundStyle(.red)
-                                    .padding(.horizontal)
-                                    .id("error")
-                            }
+                            .padding(.horizontal)
+                            .padding(.top, 8)
                         }
-                        .padding(.horizontal)
-                        .padding(.top, 8)
-                    }
-                    .scrollDismissesKeyboard(.interactively)
-                    .onChange(of: messages.count) {
-                        withAnimation { proxy.scrollTo(messages.last?.id as AnyHashable? ?? "typing" as AnyHashable, anchor: .bottom) }
-                    }
-                    .onChange(of: isLoading) {
-                        if isLoading { withAnimation { proxy.scrollTo("typing", anchor: .bottom) } }
-                    }
-                    .onChange(of: streamingContent) {
-                        proxy.scrollTo("streaming", anchor: .bottom)
+                        .scrollDismissesKeyboard(.interactively)
+                        .onChange(of: messages.count) {
+                            withAnimation { proxy.scrollTo(messages.last?.id as AnyHashable? ?? "typing" as AnyHashable, anchor: .bottom) }
+                        }
+                        .onChange(of: isLoading) {
+                            if isLoading { withAnimation { proxy.scrollTo("typing", anchor: .bottom) } }
+                        }
+                        .onChange(of: streamingContent) {
+                            proxy.scrollTo("streaming", anchor: .bottom)
+                        }
                     }
                 }
 
                 Divider()
 
-                // Attached kit chips
-                if !selectedKitIDs.isEmpty {
+                // Attached kit chips (Ask mode only)
+                if mode == .ask && !selectedKitIDs.isEmpty {
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 6) {
                             ForEach(contextKits) { kit in
@@ -111,20 +116,22 @@ struct AssistantView: View {
 
                 // Input bar
                 HStack(spacing: 8) {
-                    Button {
-                        showingKitPicker = true
-                    } label: {
-                        Image(systemName: selectedKitIDs.isEmpty ? "paperclip" : "paperclip.badge.ellipsis")
-                            .font(.title3)
-                            .foregroundStyle(selectedKitIDs.isEmpty ? Color.secondary : Color.accentColor)
-                    }
+                    if mode == .ask {
+                        Button {
+                            showingKitPicker = true
+                        } label: {
+                            Image(systemName: selectedKitIDs.isEmpty ? "paperclip" : "paperclip.badge.ellipsis")
+                                .font(.title3)
+                                .foregroundStyle(selectedKitIDs.isEmpty ? Color.secondary : Color.accentColor)
+                        }
 
-                    Button {
-                        useKnowledgeBase.toggle()
-                    } label: {
-                        Image(systemName: useKnowledgeBase ? "book.fill" : "book")
-                            .font(.title3)
-                            .foregroundStyle(useKnowledgeBase ? Color.accentColor : Color.secondary)
+                        Button {
+                            useKnowledgeBase.toggle()
+                        } label: {
+                            Image(systemName: useKnowledgeBase ? "book.fill" : "book")
+                                .font(.title3)
+                                .foregroundStyle(useKnowledgeBase ? Color.accentColor : Color.secondary)
+                        }
                     }
 
                     TextField(mode.placeholder, text: $input, axis: .vertical)
@@ -170,6 +177,11 @@ struct AssistantView: View {
             .sheet(isPresented: $showingKitPicker) {
                 KitPickerSheet(kits: kits, selectedKitIDs: $selectedKitIDs)
             }
+            .onChange(of: mode) {
+                if mode == .search {
+                    Task { await VectorStore.shared.prepare() }
+                }
+            }
             .sheet(isPresented: $showingHistory) {
                 ChatHistorySheet(
                     conversations: conversations,
@@ -205,6 +217,35 @@ struct AssistantView: View {
         .padding(.top, 60)
     }
 
+    // MARK: - Search results
+
+    private var searchResultsView: some View {
+        ScrollView {
+            LazyVStack(spacing: 0) {
+                if isLoading {
+                    TypingIndicator()
+                        .frame(maxWidth: .infinity)
+                        .padding(.top, 60)
+                } else if !hasSearched {
+                    emptyState
+                } else if searchResults.isEmpty {
+                    ContentUnavailableView("No Results", systemImage: "magnifyingglass",
+                                          description: Text("Try a different search term."))
+                        .padding(.top, 40)
+                } else {
+                    ForEach(searchResults) { chunk in
+                        NavigationLink(destination: ChunkDetailView(chunk: chunk)) {
+                            SearchResultRow(chunk: chunk)
+                        }
+                        .buttonStyle(.plain)
+                        Divider().padding(.leading)
+                    }
+                }
+            }
+        }
+        .scrollDismissesKeyboard(.interactively)
+    }
+
     // MARK: - Send
 
     private func send() {
@@ -212,8 +253,29 @@ struct AssistantView: View {
         guard !query.isEmpty else { return }
         input = ""
         error = nil
-        streamingContent = ""
 
+        if mode == .search {
+            sendSearch(query: query)
+        } else {
+            sendAsk(query: query)
+        }
+    }
+
+    private func sendSearch(query: String) {
+        isLoading = true
+        hasSearched = true
+        Task {
+            await VectorStore.shared.prepare()
+            let results = await VectorStore.shared.search(query, topK: 5)
+            await MainActor.run {
+                searchResults = results
+                isLoading = false
+            }
+        }
+    }
+
+    private func sendAsk(query: String) {
+        streamingContent = ""
         let userMessage = ChatMessage(role: .user, content: query)
         messages.append(userMessage)
         persistMessage(userMessage)
@@ -508,29 +570,29 @@ private struct KitPickerSheet: View {
 // MARK: - Supporting types
 
 enum AssistantMode: String, CaseIterable, Identifiable {
-    case ask       = "ask"
-    case emergency = "emergency"
+    case ask    = "ask"
+    case search = "search"
 
     var id: String { rawValue }
 
     var label: String {
         switch self {
-        case .ask:       "Ask"
-        case .emergency: "Emergency"
+        case .ask:    "Ask"
+        case .search: "Search"
         }
     }
 
     var placeholder: String {
         switch self {
-        case .ask:       "Ask anything about your kits..."
-        case .emergency: "Describe the situation..."
+        case .ask:    "Ask anything about your kits..."
+        case .search: "Search first aid conditions…"
         }
     }
 
     var emptyStateText: String {
         switch self {
-        case .ask:       "Ask about your inventory, get restock suggestions,\nor plan for a trip."
-        case .emergency: "Describe an injury or emergency situation\nto get a step-by-step protocol."
+        case .ask:    "Ask about your inventory, get restock suggestions,\nor plan for a trip."
+        case .search: "Search the St John Ambulance first aid guide\nusing on-device semantic search."
         }
     }
 }
@@ -591,6 +653,39 @@ private struct AIDisclaimerSheet: View {
         }
         .padding(.horizontal, 24)
         .interactiveDismissDisabled()
+    }
+}
+
+private struct SearchResultRow: View {
+    let chunk: FirstAidChunk
+
+    var body: some View {
+        HStack {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(chunk.condition)
+                    .font(.body)
+                    .foregroundStyle(.primary)
+                HStack(spacing: 6) {
+                    Text(chunk.category)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    if chunk.severity == "life-threatening" || chunk.severity == "serious" {
+                        Text(chunk.severity)
+                            .font(.caption2)
+                            .foregroundStyle(.white)
+                            .padding(.horizontal, 5)
+                            .padding(.vertical, 2)
+                            .background(chunk.severity == "life-threatening" ? Color.red : Color.orange,
+                                        in: Capsule())
+                    }
+                }
+            }
+            Spacer()
+            Image(systemName: "chevron.right")
+                .font(.caption)
+                .foregroundStyle(.tertiary)
+        }
+        .padding()
     }
 }
 

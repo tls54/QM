@@ -1,0 +1,1165 @@
+[
+  {
+    "id": "15",
+    "condition": "Allergic Reactions and Anaphylaxis",
+    "category": "Airway & Breathing",
+    "severity": "life-threatening",
+    "source": "St John Ambulance First Aid Reference Guide",
+    "pageRange": "43–43",
+    "overview": "An allergic reaction can range from mild to severe, with anaphylaxis being a life-threatening condition requiring immediate treatment. The goal is to relieve symptoms and seek medical help.",
+    "recognition": [
+      "Anxiety",
+      "Red, blotchy skin eruptions",
+      "Red and watery eyes",
+      "Swelling of the tongue and throat",
+      "Pale or flushed skin",
+      "Impaired breathing",
+      "Signs of shock leading to becoming unresponsive"
+    ],
+    "treatment": [
+      "Dial 999 or 112 for an ambulance",
+      "Check whether the casualty has the necessary medication. If they do, help them to use it",
+      "If the casualty is responsive, sit them in a position that helps them breathe",
+      "If the casualty is unresponsive, open their airway and check their breathing. If they are breathing normally, place them in the recovery position. If they are not, perform CPR",
+      "Be aware of the possibility of shock"
+    ]
+  },
+  {
+    "id": "14",
+    "condition": "Asthma",
+    "category": "Airway & Breathing",
+    "severity": "serious",
+    "source": "St John Ambulance First Aid Reference Guide",
+    "pageRange": "41–42",
+    "overview": "Asthma is a chronic condition that affects the airways, causing difficulty breathing. Treatment aims to relieve symptoms and ensure the casualty can breathe effectively while getting medical help if needed.",
+    "recognition": [
+      "Difficulty breathing and/or talking",
+      "Wheezing",
+      "Distress and anxiety",
+      "Coughing",
+      "Grey-blue skin (cyanosis)",
+      "May only be able to speak in one word or short sentences",
+      "In a severe attack, the casualty may experience exhaustion, become unresponsive and stop breathing"
+    ],
+    "treatment": [
+      "Keep calm and reassure the casualty. Get them to take a dose of their reliever inhaler, using a spacer if they have one. This should relieve the asthma attack within a few minutes. Encourage the casualty to breathe slowly and deeply",
+      "Let the casualty find a position that they find comfortable. This is often sitting down. Do not make them lie down",
+      "A mild attack should ease within a few minutes of them using their inhaler. If it doesn’t the casualty may take 1-2 puffs of their inhaler every 30-60 seconds for up to 10 puffs. If they have a personal plan this should be followed and seek medical aid if necessary",
+      "Dial 999 or 112 for an ambulance if any of these things happen: the casualty’s condition gets worse or their inhaler has had no effect; the casualty becomes exhausted or finds talking difficult",
+      "Monitor and record the casualty’s vital signs until help arrives. If there is a delay of more than 15 minutes repeat taking 1-2 puffs every 30-60 seconds up to 10 puffs",
+      "If the casualty becomes unresponsive, open their airway and check breathing: If the casualty is breathing normally, place them in the recovery position. Monitor the casualty’s breathing and level of response until the emergency services arrive. If the casualty is not breathing normally, perform CPR"
+    ]
+  },
+  {
+    "id": "16",
+    "condition": "Auto-injector",
+    "category": "Airway & Breathing",
+    "severity": "life-threatening",
+    "source": "St John Ambulance First Aid Reference Guide",
+    "pageRange": "44–44",
+    "overview": "An auto-injector is used to treat anaphylaxis, a severe allergic reaction. The goal is to administer medication quickly and safely to the casualty.",
+    "recognition": [
+      "Abnormally fast or deep breathing",
+      "Anxiety",
+      "Fast pulse rate",
+      "Trembling or tingling in hands and feet",
+      "Sweaty and dry mouth",
+      "Dizziness or faintness",
+      "Cramping in hands, feet, and around the mouth"
+    ],
+    "treatment": [
+      "Arm the auto-injector by removing it from the case and taking off the safety cap",
+      "Help the casualty administer the auto-injector into the middle of their outer thigh, pushing the tip until it clicks",
+      "Hold the auto-injector in place for 3 seconds or as instructed",
+      "Give repeated doses every 5 minutes if there is no improvement or symptoms return and a second auto-injector is available",
+      "Give any used auto-injectors to the emergency services as proof of administration",
+      "Advise the casualty to get a new auto-injector as soon as possible",
+      "Be kind and reassure the casualty",
+      "Take them somewhere quiet, if possible"
+    ]
+  },
+  {
+    "id": "13",
+    "condition": "Choking",
+    "category": "Airway & Breathing",
+    "severity": "life-threatening",
+    "source": "St John Ambulance First Aid Reference Guide",
+    "pageRange": "40–40",
+    "overview": "Choking occurs when an object blocks the airway, preventing breathing. The aim of treatment is to clear the obstruction and provide emergency help if needed.",
+    "recognition": [
+      "Unable to speak or cry",
+      "Difficulty coughing or breathing",
+      "Inability to make any noise",
+      "Signs of distress or panic"
+    ],
+    "treatment": [
+      "Encourage the casualty to cough",
+      "If they cannot clear the object themselves, or they cannot cough or breathe, support them with one hand while leaning them forwards. Give up to five back blows between their shoulder blades",
+      "Visually check the casualty’s mouth and remove any obstruction with your fingertips (do not sweep blindly with your finger). If choking persists, proceed to step 4",
+      "Give up to five abdominal thrusts. Stand behind the casualty and link your hands below their rib cage. Pull sharply inwards and upwards. Check their mouth",
+      "If the obstruction still hasn’t cleared, dial 999 or 112 for emergency help",
+      "Continue the cycles of back blows and abdominal thrusts while waiting for help to arrive",
+      "If the casualty becomes unresponsive at any point, open their airway and check their breathing",
+      "If the casualty is breathing normally, place them in the recovery position",
+      "If the casualty is not breathing normally, perform CPR",
+      "For a baby, lay the baby face down on your thigh while supporting their head. Give the baby up to five back blows",
+      "Turn the infant over so they are lying on your other thigh, along your arm with their head supported and check their mouth for obvious obstructions (do not sweep blindly with your finger). If choking persists, proceed to step 3",
+      "Give up to five chest thrusts. Place two fingers on the breastbone, one finger’s breadth below the nipple line, and push with a downwards motion",
+      "Check the mouth",
+      "If the obstruction still hasn’t cleared, dial 999 or 112 for emergency help. Take the baby with you if necessary",
+      "Continue the cycles of back blows and chest thrusts while waiting for help to arrive or the baby becomes unresponsive",
+      "If the baby becomes unresponsive at any point, open their airway and check their breathing",
+      "If the baby is breathing normally, place them in the recovery position",
+      "If the baby is not breathing normally, perform CPR"
+    ]
+  },
+  {
+    "id": "17",
+    "condition": "Hyperventilation",
+    "category": "Airway & Breathing",
+    "severity": "minor",
+    "source": "St John Ambulance First Aid Reference Guide",
+    "pageRange": "45–45",
+    "overview": "Hyperventilation is rapid breathing that can lead to dizziness and tingling. It is often caused by anxiety but can also result from other medical conditions.",
+    "recognition": [
+      "Rapid breathing",
+      "Dizziness or lightheadedness",
+      "Tingling in the hands or around the mouth",
+      "Feelings of anxiety or panic",
+      "Chest discomfort or tightness"
+    ],
+    "treatment": [
+      "Encourage the casualty to breathe slowly into a paper bag if available",
+      "Help them sit down and remain calm",
+      "Reassure them and stay with them until help arrives",
+      "Encourage them to seek medical advice"
+    ]
+  },
+  {
+    "id": "0",
+    "condition": "Assessing a casualty — Primary Survey",
+    "category": "Assessment",
+    "severity": "core",
+    "source": "St John Ambulance First Aid Reference Guide",
+    "pageRange": "15–18",
+    "overview": "The primary survey is a quick assessment to identify and address life-threatening injuries or conditions. It follows the DRABC steps: Danger, Response, Airway, Breathing, and Circulation.",
+    "recognition": [],
+    "treatment": [
+      "Ensure there is no danger to you or the casualty. Move potential dangers if possible, but only as a last resort move the casualty.",
+      "Check if the casualty is responsive by calling their name, asking a question, or gently tapping their shoulders or the sole of a baby’s foot.",
+      "Shout for help or ask bystanders to assist while checking the casualty.",
+      "Open the casualty’s airway by tilting their head back and lifting their chin. For a baby, use one hand on the forehead and one finger on the chin. For children and adults, use one hand on the forehead and two fingertips under the chin.",
+      "Check if the casualty is breathing normally by listening, looking, and feeling for breath for no more than 10 seconds. Look for chest movement.",
+      "If the casualty is not breathing normally, perform CPR immediately.",
+      "If the casualty is breathing normally, treat any life-threatening injuries and place them in the recovery position.",
+      "If their breathing becomes noisy during treatment, stop and place them in the recovery position before continuing.",
+      "If you are alone and helping a child or baby, perform CPR for 1 minute before leaving to call for emergency help."
+    ]
+  },
+  {
+    "id": "2",
+    "condition": "Head-to-toe Survey",
+    "category": "Assessment",
+    "severity": "core",
+    "source": "St John Ambulance First Aid Reference Guide",
+    "pageRange": "19–19",
+    "overview": "The head-to-toe survey is a systematic way to assess a casualty for injuries after ensuring the airway, breathing, and circulation are stable. It helps identify hidden injuries and guide further treatment.",
+    "recognition": [],
+    "treatment": [
+      "Run your hands over the casualty’s scalp looking for bleeding, swelling or indentations. Try not to move their head or neck",
+      "Look into each ear for blood, fluid or objects",
+      "Open their eyes and check their pupils for size and reaction to light. The pupils should be an equal and normal size and react equally",
+      "Check their nose for blood, fluid or objects",
+      "Check the rate and depth of their breathing. Note any unusual odour on their breath",
+      "Check their mouth for anything that may block their airway. Do not remove dentures unless they are loose. Check for wounds",
+      "Look at their face for wounds or irregularities to the natural lines",
+      "Note the colour and temperature of their skin",
+      "Loosen clothing around their neck. Look for wounds or swelling to their neck tissues",
+      "Check for a medic-alert talisman, which is usually worn around the neck or wrist",
+      "Move your hands down their chest to check for swellings, irregularities or wounds. If the casualty is responsive, ask them to take a breath to assess the chest for equal movements and to listen for unusual lung sounds",
+      "Check their collar bones for deformities",
+      "Check each arm in turn for wounds or irregularities. If the casualty is responsive, ask them to bend and straighten their fingers and elbows if it doesn’t cause pain",
+      "Check each hand and finger for injury",
+      "If there is a problem with movement or loss of feeling in their arms, do not examine their spine. If there is not, place your hands under the hollow of their back to check for swelling, tenderness or irregularity",
+      "Look at their abdomen for wounds or bruising, then place a hand on the casualty’s abdomen. Press down gently, looking for tenderness or rigidity",
+      "Note any signs of incontinence or bleeding from the genital or anal areas",
+      "Examine each leg in turn for wounds and swelling. If the casualty is responsive, ask them to move each joint in turn",
+      "Check each foot and ankle for swelling, irregularity and movement",
+      "When you have completed the survey treat any problems you have found. Note any abnormalities so that this information can be given to the emergency services"
+    ]
+  },
+  {
+    "id": "3",
+    "condition": "Monitoring a Casualty",
+    "category": "Assessment",
+    "severity": "core",
+    "source": "St John Ambulance First Aid Reference Guide",
+    "pageRange": "20–21",
+    "overview": "Monitoring a casualty involves checking their breathing and level of response to ensure their condition is stable until emergency services arrive.",
+    "recognition": [
+      "Unresponsive to stimuli",
+      "Abnormal breathing rate or depth",
+      "Unusual breathing noises",
+      "Shallow or labored breathing"
+    ],
+    "treatment": [
+      "Monitor the casualty's breathing rate, depth, ease, and noise",
+      "Assess the casualty's level of response using the AVPU scale: Alert, Voice, Pain, Unresponsive",
+      "Record observations regularly and note any changes",
+      "If the casualty is unresponsive and not breathing normally, start CPR",
+      "If the casualty is unresponsive but breathing, place them in the recovery position"
+    ]
+  },
+  {
+    "id": "1",
+    "condition": "Secondary Survey",
+    "category": "Assessment",
+    "severity": "core",
+    "source": "St John Ambulance First Aid Reference Guide",
+    "pageRange": "unknown",
+    "overview": "The secondary survey is a methodical assessment to identify additional injuries or conditions after the initial primary survey. It includes taking a history, checking for signs and symptoms, and performing a head-to-toe physical examination.",
+    "recognition": [],
+    "treatment": [
+      "Ask about the casualty's history, including allergies, medications, previous medical conditions, last meal, and event history (AMPLE history).",
+      "Look for signs such as swelling, deformity, bleeding, or any obvious injury.",
+      "Listen to symptoms the casualty reports, such as pain or feeling unwell.",
+      "Conduct a head-to-toe physical examination, explaining each step to the casualty.",
+      "Communicate clearly with the casualty throughout the process."
+    ]
+  },
+  {
+    "id": "27",
+    "condition": "Amputation",
+    "category": "Bleeding",
+    "severity": "life-threatening",
+    "source": "St John Ambulance First Aid Reference Guide",
+    "pageRange": "54–55",
+    "overview": "Amputation involves the complete or partial loss of a limb, often due to severe trauma. Immediate treatment focuses on controlling bleeding and preserving the amputated part for potential reattachment.",
+    "recognition": [
+      "Complete or partial loss of a limb",
+      "Severe bleeding from the amputation site",
+      "Exposed muscle, bone, or tendons",
+      "Shock symptoms such as pale, cold, clammy skin and rapid pulse"
+    ],
+    "treatment": [
+      "Apply a tourniquet around the limb close to and above the injury. If possible, place it below the elbow or knee. Never place it on a joint.",
+      "Pull the tourniquet strap tight so that three fingers cannot fit under it. Wrap the tail of the strap around the limb.",
+      "Tighten the tourniquet rod by twisting it until the bleeding stops. Secure it in place using the rod clip. A second tourniquet may be applied alongside and above the first if needed.",
+      "Record the time on the time tab (if available) and monitor the casualty until the ambulance arrives.",
+      "Place the amputated part in a clean plastic bag, wrap it in soft material, and put it in crushed ice for transport to the hospital."
+    ]
+  },
+  {
+    "id": "22",
+    "condition": "Bleeding — Minor, Nosebleed, Bruising",
+    "category": "Bleeding",
+    "severity": "minor",
+    "source": "St John Ambulance First Aid Reference Guide",
+    "pageRange": "49–50",
+    "overview": "Minor bleeding, such as from a nosebleed or bruising, is usually not life-threatening but should be managed to prevent infection and further injury.",
+    "recognition": [
+      "Visible blood from the nose or skin",
+      "Discoloration or swelling in the affected area",
+      "Pain or tenderness at the site of injury",
+      "Bruising appears as a dark, discolored patch on the skin"
+    ],
+    "treatment": [
+      "Sit casualty down and tilt head forward for nosebleed to allow blood to drain",
+      "Pinch the soft part of the nose for 10 minutes to apply pressure",
+      "Repeat pressure application if bleeding continues",
+      "For minor wounds, clean with running water or alcohol-free wipe",
+      "Pat dry with sterile material and cover with a sterile dressing",
+      "Elevate and support injured area above heart level if possible",
+      "Apply cold compress to bruised area for at least 20 minutes",
+      "For splinters, clean area with warm water and soap",
+      "Use tweezers to gently remove splinter in the same angle it entered the skin",
+      "Encourage slight bleeding to clear any trapped dirt",
+      "Cover wound with a clean dressing",
+      "Ask about tetanus immunization and seek medical help if unsure or wound is dirty",
+      "If bleeding is severe or does not stop, dial emergency services and apply direct pressure",
+      "Treat for shock by laying casualty down with feet raised"
+    ]
+  },
+  {
+    "id": "26",
+    "condition": "Catastrophic Bleeding and Tourniquets",
+    "category": "Bleeding",
+    "severity": "life-threatening",
+    "source": "St John Ambulance First Aid Reference Guide",
+    "pageRange": "53–53",
+    "overview": "",
+    "recognition": [],
+    "treatment": [
+      "1. Place the pad over the wound and hold it tightly in place for a minimum of 5\nminutes, in some instances the dressing may need to be packed tightly into the\nwound.\n2. Secure the dressing in place with the bandage, this may be attached or may be\nseparate. They often have Velcro strips to help you secure it tightly in place\n3. Recheck the dressing and monitor the casualty until the ambulance arrives\nAmputation\nOn occasions limbs, fingers, toes or ears can be partly or completely severed.\nIn many cases, surgery can be used to reattach the part. It is important that the\ncasualty and the severed part are got to the hospital quickly.\n1. Control the bleeding, apply direct pressure with a dressing or clean cloth and\nraise above the casualty’s heart.\n\n2. Secure the dressing in place with a bandage, tight enough to apply pressure, not\ntoo tight to impair circulation.\n3. Treat the casualty for shock.\n4. Call 999/112.\n5. Wrap the severed part in kitchen film or a clean plastic bag. Then wrap in gauze\nor soft material and place in a container of crushed ice.\nDo not\n- Wash the severed part\n- Let the severed part touch the ice\nAmputation of a limb\n1. Place the tourniquet around the limb close to the amputation or partial"
+    ]
+  },
+  {
+    "id": "24",
+    "condition": "Embedded Objects in Wounds",
+    "category": "Bleeding",
+    "severity": "serious",
+    "source": "St John Ambulance First Aid Reference Guide",
+    "pageRange": "unknown",
+    "overview": "An embedded object in a wound can cause severe internal damage, especially in the chest area, leading to life-threatening conditions like pneumothorax or tension pneumothorax.",
+    "recognition": [
+      "Breathing difficulties, often painful, rapid, shallow and uneven breaths",
+      "Acute sense of alarm",
+      "Lack of oxygen reaching tissues (hypoxia)",
+      "Grey-blue skin (cyanosis)"
+    ],
+    "treatment": [
+      "Dial 999 or 112 for the emergency services",
+      "Do not remove the embedded object as this can cause further damage",
+      "Stabilize the object with bulky dressings if possible",
+      "Keep the casualty as still as possible to prevent movement of the object",
+      "Monitor breathing and level of consciousness until help arrives"
+    ]
+  },
+  {
+    "id": "25",
+    "condition": "Penetrating Chest Wound",
+    "category": "Bleeding",
+    "severity": "life-threatening",
+    "source": "St John Ambulance First Aid Reference Guide",
+    "pageRange": "52–52",
+    "overview": "A penetrating chest wound is a serious injury where an object pierces the chest wall, potentially damaging internal organs and causing severe bleeding or air leakage. The goal is to maintain breathing, control bleeding, and seek immediate medical help.",
+    "recognition": [
+      "Coughing up blood",
+      "Skin around the wound crackles",
+      "Blood bubbling from the wound",
+      "Sound of air entering through wound as casualty breathes in",
+      "Neck veins become prominent"
+    ],
+    "treatment": [
+      "Help the casualty to sit down and to lean toward the wound",
+      "If the wound is bleeding, ask them to press on it using the palm of their hand or apply a dressing",
+      "Dial 999 or 112 for the emergency services",
+      "Maintain the casualty’s position. Monitor breathing and level of response until emergency services arrive",
+      "If the casualty becomes unresponsive, perform DRABC and maintain an open airway. Place them in the recovery position on their injured side to minimise pressure on their healthy lung",
+      "For catastrophic bleeding, apply a haemostatic dressing, tourniquet, or improvise a tourniquet following ambulance control instructions"
+    ]
+  },
+  {
+    "id": "23",
+    "condition": "Severe Bleeding",
+    "category": "Bleeding",
+    "severity": "life-threatening",
+    "source": "St John Ambulance First Aid Reference Guide",
+    "pageRange": "51–51",
+    "overview": "Severe bleeding is life-threatening and requires immediate action to control the blood loss and prevent shock. The priority is to stop the bleeding, protect the wound, and seek professional medical help.",
+    "recognition": [
+      "Visible blood loss from a wound",
+      "Bleeding that soaks through dressings",
+      "Pulse is weak or rapid",
+      "Casualty appears pale, sweaty, or drowsy",
+      "Unconsciousness or confusion"
+    ],
+    "treatment": [
+      "Apply direct pressure to the wound using a clean dressing or cloth",
+      "If bleeding continues, add more dressings on top without removing the old ones",
+      "Apply pressure on either side of any embedded object without pushing it further into the wound",
+      "Cover the wound and object with sterile gauze and pad around the object",
+      "Secure the dressing with a bandage, ensuring no pressure is applied directly to the object",
+      "Check the casualty’s circulation beyond the bandage every ten minutes",
+      "Loosen and reapply the bandage if necessary",
+      "Monitor the casualty’s breathing and level of response while waiting for emergency services"
+    ]
+  },
+  {
+    "id": "45",
+    "condition": "Crush Injuries",
+    "category": "Bone & Muscle",
+    "severity": "serious",
+    "source": "St John Ambulance First Aid Reference Guide",
+    "pageRange": "72–72",
+    "overview": "Crush injuries occur when a body part is trapped under heavy objects, causing damage to muscles, bones, and tissues. The main goals are to stabilize the casualty and prevent further harm until professional help arrives.",
+    "recognition": [
+      "Severe pain and swelling in the affected area",
+      "Deformity or obvious injury to the limb or body part",
+      "Inability to move the affected limb",
+      "Bleeding or open wounds",
+      "Signs of shock such as pale, cold, clammy skin",
+      "Altered level of consciousness or confusion"
+    ],
+    "treatment": [
+      "Do not attempt to free the casualty until it is safe to do so",
+      "Control any bleeding with direct pressure and a clean dressing",
+      "Immobilise any suspected fractures using splints or available materials",
+      "Treat for shock by keeping the casualty warm, calm, and lying flat if possible",
+      "Reassure the casualty and keep them calm",
+      "Monitor breathing and level of response continuously",
+      "Be prepared to perform CPR if the casualty stops breathing"
+    ]
+  },
+  {
+    "id": "42",
+    "condition": "Dislocations",
+    "category": "Bone & Muscle",
+    "severity": "serious",
+    "source": "St John Ambulance First Aid Reference Guide",
+    "pageRange": "unknown",
+    "overview": "A dislocation occurs when a bone is forced out of its normal position in a joint, often causing pain and visible deformity. The goal of treatment is to prevent further injury and seek medical help.",
+    "recognition": [
+      "pain",
+      "swelling",
+      "unnatural range of movement",
+      "immobility",
+      "grating noise or feeling",
+      "deformity",
+      "loss of strength",
+      "shock",
+      "twisting, shortening or bending of a limb"
+    ],
+    "treatment": [
+      "Support the injured limb",
+      "Immobilise the affected part"
+    ]
+  },
+  {
+    "id": "43",
+    "condition": "Fractures",
+    "category": "Bone & Muscle",
+    "severity": "serious",
+    "source": "St John Ambulance First Aid Reference Guide",
+    "pageRange": "69–69",
+    "overview": "A fracture is a break or crack in a bone. Open fractures break the skin and carry infection risk. Always consider spinal injury after falls or head trauma.",
+    "recognition": [
+      "Pain and tenderness at the injury site",
+      "Difficulty moving the affected area",
+      "Swelling, bruising, or deformity",
+      "Grating sensation or sound (crepitus)",
+      "Open wound with visible bone (open fracture)",
+      "For spinal injury: pain to neck or spine, unnatural shape or curve to the back",
+      "Spinal cord injury signs: poor limb control or paralysis, tingling or burning sensations, breathing difficulties"
+    ],
+    "treatment": [
+      "Do not move the casualty unless in immediate danger",
+      "For open fracture: cover wound with sterile dressing, control bleeding without pressing on protruding bones",
+      "Support and immobilise the injured limb in the position found",
+      "Dial 999 or 112 for an ambulance",
+      "Treat for shock",
+      "Wear disposable gloves throughout if possible",
+      "For suspected spinal injury: reassure the casualty and advise them not to move",
+      "For spinal injury: call 999/112 immediately, support head and neck in a stable position without moving the casualty"
+    ]
+  },
+  {
+    "id": "44",
+    "condition": "Spinal Injuries",
+    "category": "Bone & Muscle",
+    "severity": "life-threatening",
+    "source": "St John Ambulance First Aid Reference Guide",
+    "pageRange": "70–71",
+    "overview": "Spinal injuries can result from trauma and may affect the casualty's ability to breathe or move. The goal is to prevent further injury and maintain an open airway until professional help arrives.",
+    "recognition": [
+      "Unresponsiveness",
+      "Pain or tenderness in the neck or back",
+      "Deformity or swelling in the spine area",
+      "Numbness or weakness in limbs",
+      "Difficulty breathing"
+    ],
+    "treatment": [
+      "Kneel or lie behind the casualty’s head, rest your elbows on the ground to keep your arms steady. Hold the sides of the casualty’s head, spreading your fingers so you do not cover their ears",
+      "Open the airway using the jaw thrust method if trained; otherwise use the standard airway procedure",
+      "Check the casualty’s breathing while supporting the head",
+      "If not breathing, start CPR",
+      "Ask a bystander to call 999/112",
+      "Monitor and record vital signs until help arrives"
+    ]
+  },
+  {
+    "id": "41",
+    "condition": "Sprains and Strains",
+    "category": "Bone & Muscle",
+    "severity": "minor",
+    "source": "St John Ambulance First Aid Reference Guide",
+    "pageRange": "68–68",
+    "overview": "Sprains and strains are injuries to ligaments and muscles, often causing pain and limited movement. Treatment focuses on immobilizing the injury and seeking medical help.",
+    "recognition": [
+      "Complain of a severe, sickening pain",
+      "Unable to move the joint",
+      "Swelling and bruising around the joint",
+      "The area may look shorter, bent or deformed"
+    ],
+    "treatment": [
+      "Do not try to put the joint back into place",
+      "Support the joint in a comfortable position",
+      "Stop it from moving by supporting it with a sling or padding",
+      "Seek medical help",
+      "Treat for shock if necessary",
+      "Do not raise an injured leg. Only raise the uninjured leg",
+      "Check the circulation to the extremities (fingers and toes)"
+    ]
+  },
+  {
+    "id": "28",
+    "condition": "Burns",
+    "category": "Burns & Poisons",
+    "severity": "serious",
+    "source": "St John Ambulance First Aid Reference Guide",
+    "pageRange": "56–56",
+    "overview": "Burns are injuries caused by heat, chemicals, or electricity. Treatment aims to cool the burn, prevent infection, and seek medical help if necessary.",
+    "recognition": [
+      "Breathing difficulty",
+      "Soot around the mouth and nose",
+      "Damaged skin around the mouth",
+      "Intense pain in the eye",
+      "Unable to open the eye",
+      "Redness, swelling and burning around the eye",
+      "Eye watering profusely"
+    ],
+    "treatment": [
+      "Do not touch the burned area",
+      "Leave in place any clothing stuck to the burn unless it is contaminated with chemicals",
+      "Leave any blisters intact",
+      "Hold the burn under cool or lukewarm running water for a minimum of 20 minutes, or until the pain eases",
+      "Remove any jewellery or other constrictions while cooling",
+      "Cover with a clean plastic bag, kitchen film or a sterile dressing",
+      "Do not remove anything that is sticking to the burn",
+      "Do not over cool the casualty as there is a risk of lowering their body temperature too much",
+      "Do not use lotions, ointments or creams",
+      "Do not use adhesive dressings",
+      "Do not break blisters",
+      "If it is a chemical burn, cool the burn with cool or lukewarm running water until the ambulance arrives",
+      "Avoid splashing any contaminated water on yourself or the casualty",
+      "As you pour cold water over the burn, carefully remove any contaminated clothing",
+      "If clothing is stuck to the skin, leave it in place and continue cooling while waiting for the ambulance",
+      "Ask the casualty to remove their contact lenses if they can",
+      "Irrigate the casualty’s eye under cool or lukewarm running water for a minimum of 20 minutes. Make sure both sides of their eyelid are well rinsed",
+      "Ensure that water drains away from the face",
+      "Avoid splashing any contaminated water on yourself or the casualty",
+      "Seek medical help if they have full thickness burns of any size",
+      "Seek medical help if they have partial thickness burns larger than 1%",
+      "Seek medical help if they have superficial burns larger than 5% of the body surface",
+      "Seek medical help if burns are on the hands, face, feet or genitals",
+      "Seek medical help if burns have a mixed pattern and/or depth or that extend all around a limb",
+      "Seek medical help for all electrical and chemical burns",
+      "Seek medical help if the casualty is a child or is elderly"
+    ]
+  },
+  {
+    "id": "29",
+    "condition": "Chemical Burns",
+    "category": "Burns & Poisons",
+    "severity": "serious",
+    "source": "St John Ambulance First Aid Reference Guide",
+    "pageRange": "57–57",
+    "overview": "Chemical burns occur when a harmful substance comes into contact with the skin or is ingested, causing tissue damage. Immediate treatment aims to minimize injury and seek professional medical help.",
+    "recognition": [
+      "Vomiting, sometimes including blood",
+      "Burning or pain sensation",
+      "Loss of response"
+    ],
+    "treatment": [
+      "Try to find out what the casualty has swallowed. Keep any containers or packages with information about the possible poison, handling them with care. Reassure the casualty",
+      "Dial 999 or 112 for an ambulance",
+      "If the casualty is unresponsive, open their airway and check their breathing: if breathing normally, place them in the recovery position; if not breathing normally, be prepared to perform CPR",
+      "When the emergency services arrive, pass on any details of the poison including the container or package"
+    ]
+  },
+  {
+    "id": "32",
+    "condition": "Foreign Objects — Eye, Ear, Nose",
+    "category": "Burns & Poisons",
+    "severity": "minor",
+    "source": "St John Ambulance First Aid Reference Guide",
+    "pageRange": "61–61",
+    "overview": "Foreign objects in the eye, ear, or nose can cause discomfort and complications. The aim is to avoid causing further injury and seek medical assistance when necessary.",
+    "recognition": [
+      "Difficult or noisy breathing through the nose",
+      "Swelling of the nose",
+      "Smelly or bloodstained discharge"
+    ],
+    "treatment": [
+      "Do not try to remove a foreign object lodged in the ear; seek medical help",
+      "If there is an insect in the ear, gently flood the affected ear with tepid water to float the insect out. If this does not work, seek medical help",
+      "Try to keep the casualty calm. Tell them to breathe through their mouth at a normal rate",
+      "Do not try to remove a foreign object lodged in the nose; arrange to take or send the casualty to the hospital"
+    ]
+  },
+  {
+    "id": "31",
+    "condition": "Poisonous Gases",
+    "category": "Burns & Poisons",
+    "severity": "serious",
+    "source": "St John Ambulance First Aid Reference Guide",
+    "pageRange": "60–60",
+    "overview": "Poisonous gases can cause serious harm when inhaled, leading to symptoms like difficulty breathing and eye irritation. Immediate action is crucial to ensure safety and seek medical help.",
+    "recognition": [
+      "Blurred vision",
+      "Discomfort in the eye",
+      "Eyelids in a spasm",
+      "Redness and watering of the eye"
+    ],
+    "treatment": [
+      "If possible, find out what the casualty has inhaled and look for clues such as cleaning products",
+      "Dial 999 or 112 for emergency services and pass on any information about the poison",
+      "If the casualty stops breathing normally, perform CPR",
+      "If there is a foreign object in the eye, ask the casualty not to rub their eye",
+      "Stand beside them, gently separate their eyelids with your thumbs or finger and thumb and ask them to look in different directions to examine the eye",
+      "Keep the eye open and wash out any foreign object on the white of the eye by pouring clean water from a glass or jug, starting from the inner corner",
+      "If this doesn’t work, try lifting the object out with the damp corner of a clean handkerchief",
+      "If you still can’t remove the object, seek medical help"
+    ]
+  },
+  {
+    "id": "30",
+    "condition": "Poisons — Swallowed and Skin Contact",
+    "category": "Burns & Poisons",
+    "severity": "serious",
+    "source": "St John Ambulance First Aid Reference Guide",
+    "pageRange": "58–59",
+    "overview": "Poison exposure through skin contact or inhalation can cause severe symptoms and damage. The goal is to remove the poison, support breathing, and seek medical help.",
+    "recognition": [
+      "Pain, often very intense",
+      "Skin may blister, peel and swell",
+      "Skin colour may change",
+      "Specific symptoms depend on the poison",
+      "Difficulty breathing",
+      "Lack of oxygen reaching tissues (hypoxia)",
+      "Grey-blue skin (cyanosis)",
+      "Symptoms may develop over time",
+      "Poisons reaching the brain can cause confusion, seizures or unresponsiveness"
+    ],
+    "treatment": [
+      "Try to find out what the casualty has been in contact with. Keep any containers or packages with information about the possible poison, handling them with care",
+      "Do not touch the affected area with your bare hands",
+      "Flush away any residual poison with running water for at least 20 minutes. Avoid splashing yourself or the casualty",
+      "If the casualty is unresponsive, open their airway and check their breathing",
+      "If they are breathing normally, place them in the recovery position",
+      "If they are not breathing normally, be prepared to perform CPR",
+      "Dial 999 or 112 for an ambulance",
+      "If it is safe to do so, help the casualty to fresh air, either outside or to an open area"
+    ]
+  },
+  {
+    "id": "19",
+    "condition": "Angina",
+    "category": "Circulation",
+    "severity": "serious",
+    "source": "St John Ambulance First Aid Reference Guide",
+    "pageRange": "unknown",
+    "overview": "Shock is a life-threatening condition where the body's organs do not get enough blood flow. Treatment aims to stabilize the casualty and prevent further deterioration.",
+    "recognition": [
+      "Rapid pulse",
+      "Pale, cold, clammy skin",
+      "Sweating",
+      "Grey-blue skin, especially inside the lips (cyanosis)",
+      "Weakness and dizziness"
+    ],
+    "treatment": [
+      "Reassure the casualty and make them comfortable",
+      "Keep the casualty warm and in a position that makes them feel better",
+      "Monitor their condition closely",
+      "Call for emergency medical help immediately"
+    ]
+  },
+  {
+    "id": "21",
+    "condition": "Fainting",
+    "category": "Circulation",
+    "severity": "minor",
+    "source": "St John Ambulance First Aid Reference Guide",
+    "pageRange": "48–48",
+    "overview": "Fainting is a temporary loss of consciousness caused by reduced blood flow to the brain. The aim of treatment is to restore blood flow and seek medical help if needed.",
+    "recognition": [
+      "Sudden loss of consciousness",
+      "May fall to the ground",
+      "Usually regains consciousness quickly",
+      "May appear pale or sweaty before fainting"
+    ],
+    "treatment": [
+      "Raise the casualty’s legs to improve blood flow to the brain",
+      "If they do not become responsive quickly: reassess DRABC",
+      "Place them in the recovery position if they are breathing",
+      "Dial 999 or 112 for an ambulance"
+    ]
+  },
+  {
+    "id": "18",
+    "condition": "Heart Attack",
+    "category": "Circulation",
+    "severity": "life-threatening",
+    "source": "St John Ambulance First Aid Reference Guide",
+    "pageRange": "46–46",
+    "overview": "A heart attack occurs when blood flow to the heart is blocked, causing damage to the heart muscle. The aim of treatment is to keep the casualty at rest, provide comfort, and seek immediate medical help.",
+    "recognition": [
+      "feeling faint or giddy",
+      "an overwhelming feeling of terror",
+      "possible sudden and unexpected collapse",
+      "some people may have very few symptoms, especially those with diabetes mellitus"
+    ],
+    "treatment": [
+      "Dial 999 or 112 for an ambulance and tell the emergency services that you suspect a heart attack",
+      "Make the casualty as comfortable as possible by putting them in a half sitting position. Make sure that their head and shoulders are supported. If possible, place a coat or a blanket under their knees for additional support",
+      "Encourage the casualty to rest",
+      "If possible get the casualty to chew and swallow 300mg of aspirin (one full dose)",
+      "If the casualty has medication for angina, encourage them to take it",
+      "Monitor the casualty’s breathing and level of response until the emergency services arrive. Be prepared to start CPR"
+    ]
+  },
+  {
+    "id": "20",
+    "condition": "Shock",
+    "category": "Circulation",
+    "severity": "life-threatening",
+    "source": "St John Ambulance First Aid Reference Guide",
+    "pageRange": "47–47",
+    "overview": "Shock is a life-threatening condition where the body's organs do not receive enough blood flow. The aim of treatment is to treat the cause, improve blood supply to the brain, and seek emergency medical help.",
+    "recognition": [
+      "Nausea and possible vomiting",
+      "Thirst",
+      "Rapid, shallow breathing",
+      "Weak pulse",
+      "Restlessness or aggression",
+      "Yawning or gasping for air",
+      "Eventually becoming unresponsive"
+    ],
+    "treatment": [
+      "Treat any possible causes of shock first, like serious burns or bleeding",
+      "Lay the casualty down on a blanket and constantly reassure them",
+      "Raise and support their legs to improve blood supply. If the leg is bleeding and the casualty is comfortable, you can raise both legs. If there is a suspected fracture to the pelvis, hip or either leg, both legs should stay down",
+      "Dial 999 or 112 for an ambulance",
+      "Loosen tight clothing at the neck, chest and waist",
+      "Keep the casualty warm and reassure them. Do not let them eat or drink. If the casualty is obviously pregnant, lean her to her left side to prevent the baby restricting blood flow back to the heart",
+      "Monitor the casualty’s breathing and level of response until the emergency services arrive. Be prepared to perform CPR"
+    ]
+  },
+  {
+    "id": "34",
+    "condition": "Heat Exhaustion",
+    "category": "Heat & Cold",
+    "severity": "serious",
+    "source": "St John Ambulance First Aid Reference Guide",
+    "pageRange": "63–63",
+    "overview": "Heat exhaustion is a heat-related illness caused by prolonged exposure to high temperatures. The goal of treatment is to cool the person quickly and seek urgent medical help.",
+    "recognition": [
+      "Headache and discomfort",
+      "Dizziness",
+      "Dry skin that is also hot and flushed",
+      "Confusion",
+      "Restlessness",
+      "Response levels rapidly decline",
+      "High body temperature"
+    ],
+    "treatment": [
+      "Help the casualty to a cool place. Remove as much of their outer clothing as possible",
+      "Dial 999 or 112 for an ambulance",
+      "Wrap the casualty in a cold, wet sheet. Use cold water to keep the sheet wet until their temperature seems to return to normal. If no sheet is available, fan the casualty or sponge them with cold water",
+      "Once the casualty’s temperature appears to have returned to normal, replace the wet sheet with a dry one",
+      "Monitor their condition until the emergency services arrive. If their temperature rises again, repeat steps 3 and 4"
+    ]
+  },
+  {
+    "id": "35",
+    "condition": "Heatstroke",
+    "category": "Heat & Cold",
+    "severity": "life-threatening",
+    "source": "St John Ambulance First Aid Reference Guide",
+    "pageRange": "64–64",
+    "overview": "Heatstroke occurs when the body overheats due to prolonged exposure to high temperatures. The aim of treatment is to cool the body and relieve discomfort.",
+    "recognition": [
+      "Reddened skin",
+      "Skin painful to touch or against clothes",
+      "Blistering of affected skin",
+      "Pain and redness can develop once out of the sun"
+    ],
+    "treatment": [
+      "Help the casualty to move out of the sun - indoors or to a shady spot",
+      "Cover their skin with light clothing or a towel",
+      "Sponge their skin with cold water for 10 minutes. Alternatively, soak the affected area in cold water or in a cold bath for 10 minutes",
+      "Encourage the casualty to sip cold water frequently",
+      "If the burn is mild, an after-sun preparation may soothe it",
+      "If the burn is severe, get medical help"
+    ]
+  },
+  {
+    "id": "33",
+    "condition": "Hypothermia",
+    "category": "Heat & Cold",
+    "severity": "life-threatening",
+    "source": "St John Ambulance First Aid Reference Guide",
+    "pageRange": "62–62",
+    "overview": "Hypothermia occurs when the body loses heat faster than it can produce it, leading to a dangerously low body temperature. The goal of treatment is to rewarm the casualty safely and seek medical help.",
+    "recognition": [
+      "Shivering",
+      "Slurred speech or mumbling",
+      "Slow, shallow breathing",
+      "Weak pulse",
+      "Drowsiness or fatigue",
+      "Confusion or memory loss",
+      "Loss of coordination",
+      "Dilated pupils",
+      "Sluggish reflexes"
+    ],
+    "treatment": [
+      "Move the casualty to a warm, sheltered place if possible",
+      "Remove any wet clothing and replace with dry, warm layers",
+      "Rewarm the casualty with blankets but avoid direct heat sources like hot water bottles or fires",
+      "If alert and able, give warm non-alcoholic drinks and high-energy food such as chocolate",
+      "Monitor the casualty’s breathing and level of response until emergency services arrive",
+      "Be prepared to perform CPR if needed and do not stop until help arrives",
+      "Seek medical help immediately, especially if the casualty is elderly or a baby"
+    ]
+  },
+  {
+    "id": "36",
+    "condition": "Sunburn",
+    "category": "Heat & Cold",
+    "severity": "minor",
+    "source": "St John Ambulance First Aid Reference Guide",
+    "pageRange": "unknown",
+    "overview": "Sunburn is a skin injury caused by overexposure to ultraviolet (UV) radiation from the sun. The primary aim of treatment is to relieve pain, prevent further damage, and promote healing.",
+    "recognition": [
+      "Red, tender, and warm skin",
+      "Blistering or peeling skin",
+      "Severe pain or discomfort",
+      "Headache",
+      "Fatigue or dizziness",
+      "Nausea or chills"
+    ],
+    "treatment": [
+      "Move to a cool, shaded area",
+      "Remove clothing covering the affected area",
+      "Cool the skin with cool (not cold) water or compresses",
+      "Apply a moisturizing after-sun product or aloe vera gel",
+      "Take over-the-counter pain relief such as paracetamol or ibuprofen",
+      "Stay hydrated by drinking plenty of water",
+      "Avoid further sun exposure until the skin has healed"
+    ]
+  },
+  {
+    "id": "39",
+    "condition": "Bites and Stings",
+    "category": "Other Conditions",
+    "severity": "minor",
+    "source": "St John Ambulance First Aid Reference Guide",
+    "pageRange": "67–67",
+    "overview": "Bites and stings can cause pain, swelling, and in some cases, allergic reactions. Prompt treatment helps reduce complications and identify potential risks.",
+    "recognition": [
+      "Pain and swelling at the site of the bite or sting",
+      "Redness or irritation",
+      "Difficulty moving the affected part",
+      "Severe pain and tenderness",
+      "Distortion or bruising"
+    ],
+    "treatment": [
+      "Remove the stinger with a plastic card or fingernail as soon as possible. Do not use tweezers",
+      "Raise the affected part and apply a cold compress to minimise swelling",
+      "Keep the compress in place for at least 20 minutes",
+      "If pain and swelling persist, tell the casualty to seek medical advice",
+      "Monitor vital signs and watch for signs of an allergic reaction",
+      "For tick bites, use tweezers or a tick remover to grasp the tick’s head as close as possible to the skin and gently pull upwards",
+      "Use a steady and even pressure. Do not jerk the tick as this may leave parts embedded in the skin",
+      "Do not burn or freeze the tick, or try to remove it with butter or petroleum jelly",
+      "Collect the remnants of the tick and put it in a sealed plastic bag. Give it to the casualty for possible identification",
+      "Advise the casualty to seek medical advice"
+    ]
+  },
+  {
+    "id": "37",
+    "condition": "Meningitis",
+    "category": "Other Conditions",
+    "severity": "life-threatening",
+    "source": "St John Ambulance First Aid Reference Guide",
+    "pageRange": "65–65",
+    "overview": "Meningitis is an inflammation of the protective membranes covering the brain and spinal cord, often caused by infection. Prompt treatment is essential to prevent serious complications.",
+    "recognition": [
+      "Slurred speech or confusion",
+      "Extreme shivering or muscle pain",
+      "Passing no urine all day",
+      "Severe breathlessness",
+      "It feels like you’re going to die",
+      "Skin mottled or discoloured",
+      "Rapid breathing",
+      "Seizures",
+      "The child is very lethargic or difficult to rouse",
+      "Feels abnormally cold to touch",
+      "A rash that does not fade when pressed",
+      "Mottled blue or pale skin",
+      "Is not feeding"
+    ],
+    "treatment": [
+      "Call emergency services immediately if meningitis is suspected",
+      "Keep the person warm and comfortable while waiting for help",
+      "Do not give food or drink if the person is confused or having seizures",
+      "Monitor breathing and be prepared to begin CPR if necessary",
+      "Provide any known medical history or symptoms to emergency responders"
+    ]
+  },
+  {
+    "id": "38",
+    "condition": "Sepsis",
+    "category": "Other Conditions",
+    "severity": "life-threatening",
+    "source": "St John Ambulance First Aid Reference Guide",
+    "pageRange": "66–66",
+    "overview": "Sepsis is a life-threatening condition caused by the body's response to infection. It requires immediate medical attention to prevent organ failure and death.",
+    "recognition": [
+      "Repeated vomiting",
+      "No recent wet nappies/not passing urine all day"
+    ],
+    "treatment": [
+      "Call 999/112 for urgent help and ask could it be sepsis?",
+      "Monitor, keep cool and reassure until help arrives"
+    ]
+  },
+  {
+    "id": "40",
+    "condition": "Tick Bite",
+    "category": "Other Conditions",
+    "severity": "minor",
+    "source": "St John Ambulance First Aid Reference Guide",
+    "pageRange": "unknown",
+    "overview": "A tick bite occurs when a tick attaches to the skin and feeds on blood. Treatment aims to reduce pain and swelling and seek medical help if necessary.",
+    "recognition": [
+      "Redness or swelling at the bite site",
+      "Pain or tenderness",
+      "Warmth or a hard lump",
+      "Possible fever or rash"
+    ],
+    "treatment": [
+      "Clean the bite area with soap and water",
+      "Apply a cold pack or ice compress for 20 minutes to reduce swelling",
+      "Keep the affected area elevated if possible",
+      "Monitor for signs of infection such as increasing redness, swelling, or fever",
+      "Seek medical advice if symptoms worsen or if the bite is on the face, neck, or groin"
+    ]
+  },
+  {
+    "id": "12",
+    "condition": "Diabetes — Hypo and Hyperglycaemia",
+    "category": "Response Problems",
+    "severity": "serious",
+    "source": "St John Ambulance First Aid Reference Guide",
+    "pageRange": "38–39",
+    "overview": "Hypoglycaemia (low blood sugar) and hyperglycaemia (high blood sugar) are serious conditions in diabetes. Hypoglycaemia requires immediate treatment to restore blood sugar levels, while hyperglycaemia needs urgent medical attention.",
+    "recognition": [
+      "Weakness, faintness or hunger",
+      "Palpitations or muscle tremors",
+      "Strange actions or behaviour; confused, belligerent or even violent",
+      "Sweating",
+      "Pale, cold and clammy skin",
+      "Strong, bounding pulse",
+      "A medic-alert talisman which is usually worn around the neck or the wrist",
+      "Deep and sighing breathing",
+      "Sweet smell on the breath",
+      "Restless, drowsy or lethargic behaviour"
+    ],
+    "treatment": [
+      "If the casualty is responsive and has hypoglycaemia, help them take their own glucose gel or give them up to the equivalent of 15-20g of glucose, e.g., a 150ml glass of non-diet fizzy drink or fruit juice, three teaspoons of sugar or sugary sweets",
+      "If they improve, let them rest and give them more sugary food or drink until they feel better. Encourage them to test their blood with their glucose testing kit and monitor them until they feel completely well",
+      "If they don’t improve, look for other causes, dial 999 or 112 and monitor breathing and level of response",
+      "If the casualty is unresponsive and has hypoglycaemia, open their airway and check their breathing: If breathing normally, place them in the recovery position; if not breathing normally, perform CPR",
+      "Dial 999 or 112 for an ambulance",
+      "Monitor the casualty’s breathing and level of response until the emergency services arrive",
+      "If the casualty is choking, ask, 'Are you choking?'",
+      "If they nod yes or cannot speak, encourage them to cough. If they cannot cough, shout for help and start abdominal thrusts (Heimlich manoeuvre)",
+      "If the casualty becomes unconscious, open their airway and check for breathing. If not breathing normally, start CPR"
+    ]
+  },
+  {
+    "id": "9",
+    "condition": "Febrile Convulsions",
+    "category": "Response Problems",
+    "severity": "serious",
+    "source": "St John Ambulance First Aid Reference Guide",
+    "pageRange": "35–35",
+    "overview": "Febrile convulsions are seizures in babies and young children caused by a high temperature. The main aim of treatment is to protect the child, monitor their condition, and seek medical help.",
+    "recognition": [
+      "Sudden and severe headache that doesn’t go away"
+    ],
+    "treatment": [
+      "Let the convulsion happen naturally, but protect the baby/child from hurting themselves on hard or sharp objects: if they are on the floor, try to protect their head with a cushion or similar item: do not put anything into their mouth",
+      "Cool the baby/child by removing any bedding and clothes: you may only be able to do this once the seizure has stopped: ensure a good supply of fresh air: do not overcool",
+      "Dial 999 or 112 for an ambulance",
+      "Place the baby/child in the recovery position once the convulsion has ended: do not give them anything to eat or drink until they are fully recovered",
+      "Reassure the baby/child and monitor vital signs"
+    ]
+  },
+  {
+    "id": "11",
+    "condition": "Head Injuries",
+    "category": "Response Problems",
+    "severity": "serious",
+    "source": "St John Ambulance First Aid Reference Guide",
+    "pageRange": "37–37",
+    "overview": "Head injuries can range from mild to severe and may involve changes in responsiveness. The goal of treatment is to stabilize the casualty, monitor for deterioration, and seek medical help when necessary.",
+    "recognition": [
+      "Brief loss of responsiveness",
+      "Increased drowsiness",
+      "Worsening headache",
+      "Confusion, memory loss, strange behaviour and nausea",
+      "Weakness to a limb",
+      "Speech difficulties",
+      "Dizziness, seizures or balance problems",
+      "Sight problems, including double vision",
+      "Clear fluid or watery blood leaking from the nose or ear"
+    ],
+    "treatment": [
+      "Help the casualty to sit down in a comfortable position",
+      "Apply a cold compress to their head injury",
+      "Monitor breathing and level of response regularly. Keep a close eye on the level of response in case it deteriorates",
+      "When they have recovered ask a responsible adult to look after them",
+      "If they were playing a sport when it happened do not let them return to play until they have been fully assessed by a medical practitioner",
+      "Seek medical help if any of the following apply: worsening headache, difficulty in speaking or walking, vomiting, double vision, seizure, over 65 years old, previous brain surgery, they are taking anti clotting medication, they are intoxicated with drugs or alcohol, there is no responsible adult to look after them",
+      "If the casualty is breathing, maintain an open airway using the jaw-thrust technique",
+      "Dial 999 or 112 for an ambulance",
+      "Monitor the casualty’s breathing and level of response until the emergency services arrive. Be prepared to perform CPR"
+    ]
+  },
+  {
+    "id": "8",
+    "condition": "Seizures",
+    "category": "Response Problems",
+    "severity": "serious",
+    "source": "St John Ambulance First Aid Reference Guide",
+    "pageRange": "34–34",
+    "overview": "Seizures are sudden, uncontrolled electrical disturbances in the brain. The main aim of treatment is to protect the person, monitor their condition, and seek medical help.",
+    "recognition": [
+      "Sudden loss of response",
+      "Becoming rigid, arching their back",
+      "Breathing may become noisy and difficult",
+      "Convulsions begin (jerky movements)",
+      "Saliva from the mouth can be blood-stained if they have bitten their lips or tongue",
+      "Loss of bladder and bowel control"
+    ],
+    "treatment": [
+      "Clear space around the casualty and protect them by padding sharp or dangerous objects with coats or cushions. If possible, protect the casualty’s head from the floor with a cushion or similar item",
+      "Loosen tight clothing around the neck, chest and waist. Do not put anything into the casualty’s mouth",
+      "When the seizure stops, check the casualty’s breathing: If they are breathing normally, place them in the recovery position. If they are not breathing normally, be prepared to perform CPR. Do not attempt to force or keep their jaw open",
+      "Stay with the casualty. Monitor their breathing and level of response",
+      "Dial 999 or 112 for an ambulance if the casualty has continuous seizures, sustains an injury that requires urgent medical attention, has never had a seizure before, has a seizure that lasts for more than five minutes, or is unresponsive for more than 10 minutes"
+    ]
+  },
+  {
+    "id": "10",
+    "condition": "Stroke",
+    "category": "Response Problems",
+    "severity": "life-threatening",
+    "source": "St John Ambulance First Aid Reference Guide",
+    "pageRange": "36–36",
+    "overview": "A stroke is a medical emergency caused by a disruption of blood flow to the brain, leading to brain cell damage. Immediate treatment aims to stabilize the casualty and get urgent medical help.",
+    "recognition": [
+      "Confusion and emotional instability",
+      "Deterioration in the level of response",
+      "Weakness or paralysis on one side of the body",
+      "Slurring or loss of speech",
+      "Unequal pupils",
+      "Possible loss of bladder control"
+    ],
+    "treatment": [
+      "Use the FAST test to assess for stroke: Facial weakness, Arm weakness, Speech problems, Time to call emergency services",
+      "Keep the casualty comfortable and supported",
+      "Dial 999 or 112 for emergency services",
+      "Loosen any tight clothing and reassure the casualty",
+      "Monitor breathing and level of response until help arrives",
+      "If unresponsive, open their airway and check breathing: if breathing normally, place in recovery position; if not, begin CPR",
+      "Be prepared to perform CPR if needed"
+    ]
+  },
+  {
+    "id": "6",
+    "condition": "Automated External Defibrillation (AED)",
+    "category": "Unresponsive Casualty",
+    "severity": "life-threatening",
+    "source": "St John Ambulance First Aid Reference Guide",
+    "pageRange": "29–32",
+    "overview": "An Automated External Defibrillator (AED) is used to treat sudden cardiac arrest by delivering an electric shock to restore a normal heart rhythm. It is most effective when used quickly on an unresponsive casualty who is not breathing normally.",
+    "recognition": [
+      "Unresponsive",
+      "Not breathing normally",
+      "No signs of circulation (e.g., no pulse)"
+    ],
+    "treatment": [
+      "If necessary, perform a primary survey. If a trained first aider has already done this, check the area for flammable liquids and gases.",
+      "Ask a helper to dial 999/112 for emergency help. If alone, use your mobile device on speakerphone.",
+      "If the casualty is unresponsive and not breathing normally, prepare to use the AED. Continue CPR if someone is doing it.",
+      "Position the AED beside the casualty, ideally to their left for easier pad placement.",
+      "Remove medication patches and metal jewellery if possible, but do not delay AED use.",
+      "Turn on the AED and follow the voice prompts.",
+      "Remove electrode pads from their packets and place them on the casualty’s bare chest as instructed.",
+      "Instruct everyone to stand clear. Stop CPR. Check that no one is touching the casualty. The AED analyses the heart rhythm.",
+      "If shocks are needed, the AED will charge. Continue CPR while this happens.",
+      "Before giving the shock, confirm everyone is clear. Press the 'Shock' button.",
+      "After the shock, continue following all voice prompts. Repeat CPR as instructed.",
+      "Ensure electrode pads remain securely in place and the skin is dry before each shock.",
+      "If the casualty has a pacemaker, place the pads at least 12–15cm away from it.",
+      "If the pads become loose, smooth them in place or replace them.",
+      "If the casualty was electrocuted, remove them from the source of electricity before touching them.",
+      "If the casualty is pregnant, place a cushion under the right buttock to relieve pressure on blood vessels.",
+      "Continue resuscitation until emergency services arrive and take over.",
+      "Provide emergency services with details including the casualty’s state, number of shocks delivered, time since collapse, and any known medical history.",
+      "Dispose of used materials as clinical waste and complete any required reports."
+    ]
+  },
+  {
+    "id": "7",
+    "condition": "CPR after Drowning",
+    "category": "Unresponsive Casualty",
+    "severity": "life-threatening",
+    "source": "St John Ambulance First Aid Reference Guide",
+    "pageRange": "33–33",
+    "overview": "CPR after drowning involves providing life-saving assistance to an unresponsive person who has been submerged in water. During a pandemic, guidelines may prioritize compression-only CPR for most first aiders, while rescue breaths are reserved for specific roles.",
+    "recognition": [
+      "Unresponsive casualty",
+      "Not breathing normally",
+      "Possible signs of drowning such as water in the airway or cold, clammy skin"
+    ],
+    "treatment": [
+      "Call for emergency medical help immediately",
+      "Begin chest compressions at a rate of 100-120 per minute",
+      "If trained and in a role that allows it, give rescue breaths after every 30 compressions",
+      "Continue CPR until help arrives or the casualty shows signs of life"
+    ]
+  },
+  {
+    "id": "5",
+    "condition": "CPR — Adult, Child and Baby",
+    "category": "Unresponsive Casualty",
+    "severity": "life-threatening",
+    "source": "St John Ambulance First Aid Reference Guide",
+    "pageRange": "24–28",
+    "overview": "CPR is used to save the life of an unresponsive person who is not breathing normally. The goal is to maintain blood circulation and oxygen supply until professional help arrives.",
+    "recognition": [
+      "Unresponsive to voice or touch",
+      "Not breathing normally or showing agonal breathing (gasping)",
+      "No signs of life such as movement or coughing"
+    ],
+    "treatment": [
+      "Follow DRABC protocol: check for danger, response, open airway, check breathing for no more than 10 seconds",
+      "If unresponsive and not breathing normally, call 999 or 112 for an ambulance and get a defibrillator if available",
+      "Perform chest compressions using both hands on the centre of the chest for adults, one hand for children, and two fingertips for babies",
+      "Compress the chest to a depth of 5–6cm for adults, at least a third of the chest depth for children and babies, at a rate of 100–120 compressions per minute",
+      "Give two rescue breaths after every 30 compressions, ensuring the airway is open and a good seal is made",
+      "If unable or unwilling to give rescue breaths, perform compression-only CPR at the same rate",
+      "Continue CPR until professional help takes over, the casualty recovers, or you become too exhausted",
+      "For babies, ensure the head is not tilted too far back and avoid applying pressure to the ribs or abdomen during compressions",
+      "Use a face shield if available for hygiene during rescue breaths",
+      "During a pandemic, follow UK Resuscitation Council guidelines for compression-only CPR if recommended"
+    ]
+  },
+  {
+    "id": "4",
+    "condition": "Recovery Position",
+    "category": "Unresponsive Casualty",
+    "severity": "life-threatening",
+    "source": "St John Ambulance First Aid Reference Guide",
+    "pageRange": "22–23",
+    "overview": "The recovery position is used to safely place an unresponsive casualty on their side to maintain an open airway and prevent choking.",
+    "recognition": [
+      "Casualty is unresponsive",
+      "Casualty is breathing but not fully conscious",
+      "Casualty is at risk of choking on vomit or tongue"
+    ],
+    "treatment": [
+      "Kneel beside the casualty. Remove their spectacles. Straighten their legs",
+      "Place the arm nearest to you at right angles to the body with elbow bent and palm facing up",
+      "Take the casualty’s far arm and place it across their chest so their hand is under their cheek nearest to you",
+      "Grasp the casualty’s far leg just above the knee. Pull it up until their foot is flat on the floor",
+      "Roll the casualty towards you, keeping their hand pressed against their cheek",
+      "Adjust the casualty’s upper leg so both hip and knee are bent at right angles",
+      "Tilt the casualty’s head back to keep their airway open and clear"
+    ]
+  }
+]

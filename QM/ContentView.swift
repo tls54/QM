@@ -27,6 +27,9 @@ struct ContentView: View {
             Tab("Inventory", systemImage: "list.clipboard") {
                 InventoryView()
             }
+            Tab("Guide", systemImage: "book.closed") {
+                ReferenceView()
+            }
             Tab("Assistant", systemImage: "bubble.left.and.bubble.right") {
                 AssistantView()
             }

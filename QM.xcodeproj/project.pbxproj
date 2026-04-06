@@ -6,6 +6,30 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		403A83222F845E1E006A346B /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 403A83122F845E1E006A346B /* ContentView.swift */; };
+		403A83232F845E1E006A346B /* IconPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 403A83162F845E1E006A346B /* IconPickerView.swift */; };
+		403A83242F845E1E006A346B /* Conversation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 403A83132F845E1E006A346B /* Conversation.swift */; };
+		403A83252F845E1E006A346B /* FirstAidChunk.swift in Sources */ = {isa = PBXBuildFile; fileRef = 403A83152F845E1E006A346B /* FirstAidChunk.swift */; };
+		403A83262F845E1E006A346B /* KitIconColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 403A831B2F845E1E006A346B /* KitIconColor.swift */; };
+		403A83272F845E1E006A346B /* KitItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 403A831C2F845E1E006A346B /* KitItem.swift */; };
+		403A83282F845E1E006A346B /* KitDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 403A831A2F845E1E006A346B /* KitDetailView.swift */; };
+		403A83292F845E1E006A346B /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 403A83202F845E1E006A346B /* SettingsView.swift */; };
+		403A832A2F845E1E006A346B /* AssistantView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 403A83112F845E1E006A346B /* AssistantView.swift */; };
+		403A832B2F845E1E006A346B /* Kit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 403A83192F845E1E006A346B /* Kit.swift */; };
+		403A832C2F845E1E006A346B /* InventoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 403A83172F845E1E006A346B /* InventoryView.swift */; };
+		403A832D2F845E1E006A346B /* AddEditItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 403A830C2F845E1E006A346B /* AddEditItemView.swift */; };
+		403A832E2F845E1E006A346B /* ReferenceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 403A831F2F845E1E006A346B /* ReferenceView.swift */; };
+		403A832F2F845E1E006A346B /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 403A830E2F845E1E006A346B /* APIClient.swift */; };
+		403A83302F845E1E006A346B /* AppSchema.swift in Sources */ = {isa = PBXBuildFile; fileRef = 403A830F2F845E1E006A346B /* AppSchema.swift */; };
+		403A83312F845E1E006A346B /* ItemCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 403A83182F845E1E006A346B /* ItemCategory.swift */; };
+		403A83322F845E1E006A346B /* QMApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 403A831E2F845E1E006A346B /* QMApp.swift */; };
+		403A83332F845E1E006A346B /* KitListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 403A831D2F845E1E006A346B /* KitListView.swift */; };
+		403A83342F845E1E006A346B /* AddEditKitView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 403A830D2F845E1E006A346B /* AddEditKitView.swift */; };
+		403A83352F845E1E006A346B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 403A83102F845E1E006A346B /* Assets.xcassets */; };
+		403A83362F845E1E006A346B /* first_aid_chunks.json in Resources */ = {isa = PBXBuildFile; fileRef = 403A83142F845E1E006A346B /* first_aid_chunks.json */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		4074EBF22F70AEC2003DC839 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -24,6 +48,27 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		403A830C2F845E1E006A346B /* AddEditItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddEditItemView.swift; sourceTree = "<group>"; };
+		403A830D2F845E1E006A346B /* AddEditKitView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddEditKitView.swift; sourceTree = "<group>"; };
+		403A830E2F845E1E006A346B /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
+		403A830F2F845E1E006A346B /* AppSchema.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSchema.swift; sourceTree = "<group>"; };
+		403A83102F845E1E006A346B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		403A83112F845E1E006A346B /* AssistantView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssistantView.swift; sourceTree = "<group>"; };
+		403A83122F845E1E006A346B /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		403A83132F845E1E006A346B /* Conversation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Conversation.swift; sourceTree = "<group>"; };
+		403A83142F845E1E006A346B /* first_aid_chunks.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = first_aid_chunks.json; sourceTree = "<group>"; };
+		403A83152F845E1E006A346B /* FirstAidChunk.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirstAidChunk.swift; sourceTree = "<group>"; };
+		403A83162F845E1E006A346B /* IconPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconPickerView.swift; sourceTree = "<group>"; };
+		403A83172F845E1E006A346B /* InventoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryView.swift; sourceTree = "<group>"; };
+		403A83182F845E1E006A346B /* ItemCategory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemCategory.swift; sourceTree = "<group>"; };
+		403A83192F845E1E006A346B /* Kit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Kit.swift; sourceTree = "<group>"; };
+		403A831A2F845E1E006A346B /* KitDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KitDetailView.swift; sourceTree = "<group>"; };
+		403A831B2F845E1E006A346B /* KitIconColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KitIconColor.swift; sourceTree = "<group>"; };
+		403A831C2F845E1E006A346B /* KitItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KitItem.swift; sourceTree = "<group>"; };
+		403A831D2F845E1E006A346B /* KitListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KitListView.swift; sourceTree = "<group>"; };
+		403A831E2F845E1E006A346B /* QMApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QMApp.swift; sourceTree = "<group>"; };
+		403A831F2F845E1E006A346B /* ReferenceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReferenceView.swift; sourceTree = "<group>"; };
+		403A83202F845E1E006A346B /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		4074EBE22F70AEC1003DC839 /* QM.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = QM.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4074EBF12F70AEC2003DC839 /* QMTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = QMTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		4074EBFB2F70AEC2003DC839 /* QMUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = QMUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -72,9 +117,38 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		403A83212F845E1E006A346B /* QM */ = {
+			isa = PBXGroup;
+			children = (
+				403A830C2F845E1E006A346B /* AddEditItemView.swift */,
+				403A830D2F845E1E006A346B /* AddEditKitView.swift */,
+				403A830E2F845E1E006A346B /* APIClient.swift */,
+				403A830F2F845E1E006A346B /* AppSchema.swift */,
+				403A83102F845E1E006A346B /* Assets.xcassets */,
+				403A83112F845E1E006A346B /* AssistantView.swift */,
+				403A83122F845E1E006A346B /* ContentView.swift */,
+				403A83132F845E1E006A346B /* Conversation.swift */,
+				403A83142F845E1E006A346B /* first_aid_chunks.json */,
+				403A83152F845E1E006A346B /* FirstAidChunk.swift */,
+				403A83162F845E1E006A346B /* IconPickerView.swift */,
+				403A83172F845E1E006A346B /* InventoryView.swift */,
+				403A83182F845E1E006A346B /* ItemCategory.swift */,
+				403A83192F845E1E006A346B /* Kit.swift */,
+				403A831A2F845E1E006A346B /* KitDetailView.swift */,
+				403A831B2F845E1E006A346B /* KitIconColor.swift */,
+				403A831C2F845E1E006A346B /* KitItem.swift */,
+				403A831D2F845E1E006A346B /* KitListView.swift */,
+				403A831E2F845E1E006A346B /* QMApp.swift */,
+				403A831F2F845E1E006A346B /* ReferenceView.swift */,
+				403A83202F845E1E006A346B /* SettingsView.swift */,
+			);
+			path = QM;
+			sourceTree = "<group>";
+		};
 		4074EBD92F70AEC1003DC839 = {
 			isa = PBXGroup;
 			children = (
+				403A83212F845E1E006A346B /* QM */,
 				4074EBE42F70AEC1003DC839 /* QM */,
 				4074EBF42F70AEC2003DC839 /* QMTests */,
 				4074EBFE2F70AEC2003DC839 /* QMUITests */,
@@ -212,6 +286,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				403A83352F845E1E006A346B /* Assets.xcassets in Resources */,
+				403A83362F845E1E006A346B /* first_aid_chunks.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -236,6 +312,25 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				403A83222F845E1E006A346B /* ContentView.swift in Sources */,
+				403A83232F845E1E006A346B /* IconPickerView.swift in Sources */,
+				403A83242F845E1E006A346B /* Conversation.swift in Sources */,
+				403A83252F845E1E006A346B /* FirstAidChunk.swift in Sources */,
+				403A83262F845E1E006A346B /* KitIconColor.swift in Sources */,
+				403A83272F845E1E006A346B /* KitItem.swift in Sources */,
+				403A83282F845E1E006A346B /* KitDetailView.swift in Sources */,
+				403A83292F845E1E006A346B /* SettingsView.swift in Sources */,
+				403A832A2F845E1E006A346B /* AssistantView.swift in Sources */,
+				403A832B2F845E1E006A346B /* Kit.swift in Sources */,
+				403A832C2F845E1E006A346B /* InventoryView.swift in Sources */,
+				403A832D2F845E1E006A346B /* AddEditItemView.swift in Sources */,
+				403A832E2F845E1E006A346B /* ReferenceView.swift in Sources */,
+				403A832F2F845E1E006A346B /* APIClient.swift in Sources */,
+				403A83302F845E1E006A346B /* AppSchema.swift in Sources */,
+				403A83312F845E1E006A346B /* ItemCategory.swift in Sources */,
+				403A83322F845E1E006A346B /* QMApp.swift in Sources */,
+				403A83332F845E1E006A346B /* KitListView.swift in Sources */,
+				403A83342F845E1E006A346B /* AddEditKitView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

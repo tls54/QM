@@ -15,7 +15,7 @@ A local-first iOS app for managing first aid and outdoor equipment inventory, wi
 ## What it does
 
 - **Manage kits** — create named kits (Trek, Leader, Camp, etc.) with custom icons and colours, grouped by category (Medical, Sharps, Equipment, etc.)
-- **Track items** — quantity, expiry date, notes, and 11 item categories covering first aid and outdoor gear
+- **Track items** — quantity, expiry date, size, notes, and 13 item categories covering first aid and outdoor gear
 - **Store inventory** — a special store/stockroom kit that's always present; move items between kits
 - **Inventory view** — aggregates quantities across all kits, surfaces the worst expiry status per item
 - **Expiry and stock alerts** — configurable expiry warning threshold and low stock threshold
@@ -49,7 +49,7 @@ The app is fully functional offline. AI features (Stream 3) require the backend 
 **Architecture**
 - SwiftUI for all UI
 - SwiftData for local persistence (SQLite under the hood)
-- `AppSchema.swift` manages versioned schema migrations — future model changes can be made without data loss
+- SwiftData handles schema migrations automatically — all changes to date have been additive (new model types, new optional properties)
 
 ---
 
@@ -70,7 +70,8 @@ docker compose up --build
 The API will be available at `http://localhost:8000`.
 
 - `GET /health` — returns status and version
-- `POST /ask` — accepts a query, mode, and inventory context; returns an AI-generated response
+- `POST /ask` — accepts a query, mode, inventory context, and optional model override; streams an AI-generated response via SSE
+- `GET /models` — returns available Groq models (auth required)
 - `GET /docs` — interactive Swagger UI for testing endpoints
 
 **Configuration**
@@ -102,9 +103,9 @@ For production deployment, set these as environment variables in Railway rather 
 
 ## AI modes (Stream 3)
 
-**Ask mode** — conversational interface for planning and advice. Supports multi-turn conversation history, selective kit attachment, on-device chat history, and a toggleable first aid knowledge base (book icon). Responses stream token-by-token.
+**Ask mode** — conversational interface for planning and advice. Supports multi-turn conversation history, selective kit attachment, on-device chat history, toggleable first aid knowledge base, long-press to copy, and token-by-token streaming. Includes an AI disclaimer on first use and a persistent footer. Model can be overridden per-device in Settings.
 
-**Emergency mode** — fast, tap-based interface designed for in-situation use. User selects an injury or scenario and gets a clean numbered protocol with relevant inventory items surfaced inline (have ✓ / missing ✗). Designed to be usable under stress, no typing required. (UI in progress.)
+**Emergency mode** — fast, tap-based interface designed for in-situation use. User selects an injury or scenario and gets a clean numbered protocol with relevant inventory items surfaced inline (have ✓ / missing ✗). Designed to be usable under stress, no typing required. (In progress.)
 
 ---
 
