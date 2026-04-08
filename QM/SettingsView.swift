@@ -1,18 +1,25 @@
 import SwiftUI
 import SwiftData
+import UniformTypeIdentifiers
 
 struct SettingsView: View {
-    @AppStorage("appearancePreference") private var appearancePreference = "system"
-    @AppStorage("expiryWarningDays")    private var expiryWarningDays = 30
-    @AppStorage("lowStockThreshold")    private var lowStockThreshold = 1
-    @AppStorage("backendURL")           private var backendURL = ""
-    @AppStorage("secretKey")            private var secretKey = ""
-    @AppStorage("selectedModel")        private var selectedModel = ""
+    @AppStorage("appearancePreference")   private var appearancePreference = "system"
+    @AppStorage("expiryWarningDays")      private var expiryWarningDays = 30
+    @AppStorage("lowStockThreshold")      private var lowStockThreshold = 1
+    @AppStorage("backendURL")             private var backendURL = ""
+    @AppStorage("secretKey")              private var secretKey = ""
+    @AppStorage("selectedModel")          private var selectedModel = ""
     @AppStorage("medicalFeaturesEnabled") private var medicalFeaturesEnabled = false
 
     @Environment(\.modelContext) private var modelContext
     @Query private var kits: [Kit]
     @State private var showingClearConfirmation = false
+    @State private var showingExporter = false
+    @State private var showingImporter = false
+    @State private var exportDocument: JSONDocument?
+    @State private var pendingRestore: QMBackup?
+    @State private var showingRestoreConfirmation = false
+    @State private var restoreError: String?
     @State private var availableModels: [GroqModel] = []
     @State private var modelsLoading = false
     @State private var modelsError: String?
@@ -59,13 +66,20 @@ struct SettingsView: View {
                 }
 
                 Section {
+                    Button("Export Backup") { exportBackup() }
+                    Button("Restore Backup") { showingImporter = true }
+                    if let error = restoreError {
+                        Text(error)
+                            .font(.caption)
+                            .foregroundStyle(.red)
+                    }
                     Button("Clear All Data", role: .destructive) {
                         showingClearConfirmation = true
                     }
                 } header: {
                     Text("Data")
                 } footer: {
-                    Text("Deletes all kits and items permanently. The store will be recreated empty.")
+                    Text("Export saves all kits and items to a JSON file you can store anywhere (iCloud Drive, Files, etc.). Restore replaces all current data with the backup.")
                 }
 
                 Section {
@@ -151,7 +165,118 @@ struct SettingsView: View {
             } message: {
                 Text("All kits and items will be permanently deleted. This cannot be undone.")
             }
+            .confirmationDialog(
+                "Restore Backup?",
+                isPresented: $showingRestoreConfirmation,
+                titleVisibility: .visible
+            ) {
+                Button("Restore", role: .destructive) {
+                    if let backup = pendingRestore { applyRestore(backup) }
+                }
+                Button("Cancel", role: .cancel) { pendingRestore = nil }
+            } message: {
+                if let backup = pendingRestore {
+                    Text("This will replace all current data with \(backup.kitCount) kit(s) and \(backup.itemCount) item(s) from the backup. This cannot be undone.")
+                }
+            }
+            .fileExporter(
+                isPresented: $showingExporter,
+                document: exportDocument,
+                contentType: .json,
+                defaultFilename: exportFilename()
+            ) { _ in }
+            .fileImporter(
+                isPresented: $showingImporter,
+                allowedContentTypes: [.json]
+            ) { result in
+                loadBackup(result)
+            }
         }
+    }
+
+    private func exportFilename() -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        return "QM-backup-\(formatter.string(from: Date())).json"
+    }
+
+    private func exportBackup() {
+        let kitBackups = kits.map { kit in
+            KitBackup(
+                name: kit.name,
+                isStore: kit.isStore,
+                kitCategory: kit.kitCategory,
+                kitIcon: kit.kitIcon,
+                kitIconColor: kit.kitIconColor,
+                items: kit.items.map { item in
+                    ItemBackup(
+                        name: item.name,
+                        category: item.category,
+                        quantity: item.quantity,
+                        expiryDate: item.expiryDate,
+                        notes: item.notes,
+                        trackStock: item.trackStock,
+                        size: item.size
+                    )
+                }
+            )
+        }
+        let backup = QMBackup(exportedAt: Date(), version: 1, kits: kitBackups)
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .iso8601
+        encoder.outputFormatting = .prettyPrinted
+        guard let data = try? encoder.encode(backup) else { return }
+        exportDocument = JSONDocument(data: data)
+        showingExporter = true
+    }
+
+    private func loadBackup(_ result: Result<URL, Error>) {
+        restoreError = nil
+        guard case .success(let url) = result else { return }
+        guard url.startAccessingSecurityScopedResource() else {
+            restoreError = "Could not access the selected file."
+            return
+        }
+        defer { url.stopAccessingSecurityScopedResource() }
+        guard let data = try? Data(contentsOf: url) else {
+            restoreError = "Could not read the backup file."
+            return
+        }
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+        guard let backup = try? decoder.decode(QMBackup.self, from: data) else {
+            restoreError = "The file does not appear to be a valid QM backup."
+            return
+        }
+        pendingRestore = backup
+        showingRestoreConfirmation = true
+    }
+
+    private func applyRestore(_ backup: QMBackup) {
+        kits.forEach { modelContext.delete($0) }
+        for kitBackup in backup.kits {
+            let kit = Kit(
+                name: kitBackup.name,
+                isStore: kitBackup.isStore,
+                kitCategory: kitBackup.kitCategory,
+                kitIcon: kitBackup.kitIcon,
+                kitIconColor: KitIconColor(rawValue: kitBackup.kitIconColor) ?? .teal
+            )
+            modelContext.insert(kit)
+            for itemBackup in kitBackup.items {
+                let item = KitItem(
+                    name: itemBackup.name,
+                    category: ItemCategory(rawValue: itemBackup.category) ?? .other,
+                    quantity: itemBackup.quantity,
+                    expiryDate: itemBackup.expiryDate,
+                    notes: itemBackup.notes,
+                    trackStock: itemBackup.trackStock,
+                    size: itemBackup.size
+                )
+                kit.items.append(item)
+            }
+        }
+        pendingRestore = nil
     }
 
     private func clearAllData() {
