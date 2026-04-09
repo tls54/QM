@@ -11,7 +11,7 @@ import SwiftData
 @main
 struct QMApp: App {
     var sharedModelContainer: ModelContainer = {
-        let schema = Schema([Kit.self, KitItem.self, Conversation.self, PersistedMessage.self, KitBundle.self, BundleItem.self])
+        let schema = Schema([Kit.self, KitItem.self, Conversation.self, PersistedMessage.self, KitBundle.self, BundleItem.self, ShoppingItem.self])
 
         // Local-only config. To enable iCloud sync:
         //   1. Register bundle ID and iCloud container in Apple Developer portal

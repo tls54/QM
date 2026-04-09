@@ -25,16 +25,19 @@ struct ContentView: View {
             Tab("Kits", systemImage: "cross.case") {
                 KitListView()
             }
-            Tab("Inventory", systemImage: "list.clipboard") {
-                InventoryView()
+            Tab("Assistant", systemImage: "bubble.left.and.bubble.right") {
+                AssistantView()
+            }
+            Tab("Shopping", systemImage: "checklist") {
+                ShoppingListView()
             }
             if medicalFeaturesEnabled {
                 Tab("Guide", systemImage: "book.closed") {
                     ReferenceView()
                 }
             }
-            Tab("Assistant", systemImage: "bubble.left.and.bubble.right") {
-                AssistantView()
+            Tab("Inventory", systemImage: "list.clipboard") {
+                InventoryView()
             }
             Tab("Settings", systemImage: "gearshape") {
                 SettingsView()

@@ -24,6 +24,7 @@ struct AssistantView: View {
     @State private var currentConversation: Conversation?
     @State private var searchResults: [FirstAidChunk] = []
     @State private var hasSearched = false
+    @State private var showingPromptLibrary = false
 
     private var contextBundles: [KitBundle] {
         bundles.filter { selectedBundleIDs.contains($0.persistentModelID) }
@@ -224,6 +225,11 @@ struct AssistantView: View {
                     Task { await VectorStore.shared.prepare() }
                 }
             }
+            .sheet(isPresented: $showingPromptLibrary) {
+                PromptLibrarySheet { prompt in
+                    input = prompt
+                }
+            }
             .sheet(isPresented: $showingHistory) {
                 ChatHistorySheet(
                     conversations: conversations,
@@ -246,17 +252,55 @@ struct AssistantView: View {
     // MARK: - Empty state
 
     private var emptyState: some View {
-        VStack(spacing: 12) {
-            Image(systemName: "bubble.left.and.bubble.right")
-                .font(.largeTitle)
-                .foregroundStyle(.secondary)
-            Text(mode.emptyStateText)
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-                .multilineTextAlignment(.center)
+        VStack(spacing: 20) {
+            if mode == .ask {
+                VStack(spacing: 16) {
+                    Image(systemName: "bubble.left.and.bubble.right")
+                        .font(.largeTitle)
+                        .foregroundStyle(.secondary)
+                    Text(mode.emptyStateText)
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.center)
+
+                    VStack(spacing: 8) {
+                        ForEach(PromptLibrary.featured) { prompt in
+                            Button {
+                                input = prompt.text
+                            } label: {
+                                Text(prompt.text)
+                                    .font(.subheadline)
+                                    .foregroundStyle(.primary)
+                                    .multilineTextAlignment(.leading)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .padding(.horizontal, 14)
+                                    .padding(.vertical, 10)
+                                    .background(Color(.secondarySystemGroupedBackground),
+                                                in: RoundedRectangle(cornerRadius: 12))
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
+                    .padding(.horizontal)
+
+                    Button("Browse all prompts") {
+                        showingPromptLibrary = true
+                    }
+                    .font(.subheadline)
+                    .foregroundStyle(.tint)
+                }
+            } else {
+                Image(systemName: "magnifyingglass")
+                    .font(.largeTitle)
+                    .foregroundStyle(.secondary)
+                Text(mode.emptyStateText)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+            }
         }
         .frame(maxWidth: .infinity)
-        .padding(.top, 60)
+        .padding(.top, 40)
     }
 
     // MARK: - Search results
