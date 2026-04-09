@@ -11,6 +11,7 @@ final class Kit {
     var kitIconColor: String = KitIconColor.teal.rawValue
     var createdAt: Date
     @Relationship(deleteRule: .cascade) var items: [KitItem] = []
+    var bundles: [KitBundle] = []
 
     init(name: String, isStore: Bool = false, kitCategory: String = "", kitIcon: String = "cross.case.fill", kitIconColor: KitIconColor = .teal) {
         self.name = name

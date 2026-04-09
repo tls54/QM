@@ -3,6 +3,7 @@ import SwiftData
 
 struct AssistantView: View {
     @Query private var kits: [Kit]
+    @Query private var bundles: [KitBundle]
     @Query(sort: \Conversation.updatedAt, order: .reverse) private var conversations: [Conversation]
     @Environment(\.modelContext) private var modelContext
 
@@ -16,6 +17,7 @@ struct AssistantView: View {
     @State private var error: String?
     @State private var mode: AssistantMode = .ask
     @State private var selectedKitIDs: Set<PersistentIdentifier> = []
+    @State private var selectedBundleIDs: Set<PersistentIdentifier> = []
     @State private var useKnowledgeBase = true
     @State private var showingKitPicker = false
     @State private var showingHistory = false
@@ -23,8 +25,20 @@ struct AssistantView: View {
     @State private var searchResults: [FirstAidChunk] = []
     @State private var hasSearched = false
 
+    private var contextBundles: [KitBundle] {
+        bundles.filter { selectedBundleIDs.contains($0.persistentModelID) }
+    }
+
     private var contextKits: [Kit] {
-        kits.filter { selectedKitIDs.contains($0.persistentModelID) }
+        var ids = selectedKitIDs
+        for bundle in contextBundles {
+            for kit in bundle.kits { ids.insert(kit.persistentModelID) }
+        }
+        return kits.filter { ids.contains($0.persistentModelID) }
+    }
+
+    private var hasAttachments: Bool {
+        !selectedKitIDs.isEmpty || !selectedBundleIDs.isEmpty
     }
 
     var body: some View {
@@ -93,11 +107,29 @@ struct AssistantView: View {
 
                 Divider()
 
-                // Attached kit chips (Ask mode only)
-                if mode == .ask && !selectedKitIDs.isEmpty {
+                // Attached context chips (Ask mode only)
+                if mode == .ask && hasAttachments {
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 6) {
-                            ForEach(contextKits) { kit in
+                            ForEach(contextBundles) { bundle in
+                                HStack(spacing: 4) {
+                                    Image(systemName: bundle.kitIcon)
+                                        .font(.caption2)
+                                    Text(bundle.name)
+                                        .font(.caption)
+                                    Button {
+                                        selectedBundleIDs.remove(bundle.persistentModelID)
+                                    } label: {
+                                        Image(systemName: "xmark")
+                                            .font(.caption2)
+                                    }
+                                }
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 4)
+                                .background(bundle.iconColor.opacity(0.15), in: Capsule())
+                                .foregroundStyle(bundle.iconColor)
+                            }
+                            ForEach(kits.filter { selectedKitIDs.contains($0.persistentModelID) }) { kit in
                                 HStack(spacing: 4) {
                                     Image(systemName: kit.kitIcon)
                                         .font(.caption2)
@@ -128,9 +160,9 @@ struct AssistantView: View {
                         Button {
                             showingKitPicker = true
                         } label: {
-                            Image(systemName: selectedKitIDs.isEmpty ? "paperclip" : "paperclip.badge.ellipsis")
+                            Image(systemName: hasAttachments ? "paperclip.badge.ellipsis" : "paperclip")
                                 .font(.title3)
-                                .foregroundStyle(selectedKitIDs.isEmpty ? Color.secondary : Color.accentColor)
+                                .foregroundStyle(hasAttachments ? Color.accentColor : Color.secondary)
                         }
 
                         if medicalFeaturesEnabled {
@@ -185,7 +217,7 @@ struct AssistantView: View {
                 }
             }
             .sheet(isPresented: $showingKitPicker) {
-                KitPickerSheet(kits: kits, selectedKitIDs: $selectedKitIDs)
+                AttachmentPickerSheet(kits: kits, bundles: bundles, selectedKitIDs: $selectedKitIDs, selectedBundleIDs: $selectedBundleIDs)
             }
             .onChange(of: mode) {
                 if mode == .search {
@@ -345,6 +377,7 @@ struct AssistantView: View {
         streamingContent = ""
         currentConversation = nil
         selectedKitIDs = []
+        selectedBundleIDs = []
     }
 
     private func loadConversation(_ conversation: Conversation) {
@@ -483,19 +516,25 @@ private struct ChatHistorySheet: View {
     }
 }
 
-// MARK: - Kit picker sheet
+// MARK: - Attachment picker sheet
 
-private struct KitPickerSheet: View {
+private struct AttachmentPickerSheet: View {
     let kits: [Kit]
+    let bundles: [KitBundle]
     @Binding var selectedKitIDs: Set<PersistentIdentifier>
+    @Binding var selectedBundleIDs: Set<PersistentIdentifier>
     @Environment(\.dismiss) private var dismiss
 
-    private var allSelected: Bool {
+    private var allKitsSelected: Bool {
         kits.allSatisfy { selectedKitIDs.contains($0.persistentModelID) }
     }
 
     private var totalItems: Int {
-        kits.filter { selectedKitIDs.contains($0.persistentModelID) }.reduce(0) { $0 + $1.items.count }
+        var ids = selectedKitIDs
+        for bundle in bundles where selectedBundleIDs.contains(bundle.persistentModelID) {
+            for kit in bundle.kits { ids.insert(kit.persistentModelID) }
+        }
+        return kits.filter { ids.contains($0.persistentModelID) }.reduce(0) { $0 + $1.items.count }
     }
 
     var body: some View {
@@ -503,7 +542,7 @@ private struct KitPickerSheet: View {
             List {
                 Section {
                     Button {
-                        if allSelected {
+                        if allKitsSelected {
                             selectedKitIDs.removeAll()
                         } else {
                             selectedKitIDs = Set(kits.map { $0.persistentModelID })
@@ -513,9 +552,39 @@ private struct KitPickerSheet: View {
                             Label("All Kits", systemImage: "tray.full")
                                 .foregroundStyle(.primary)
                             Spacer()
-                            if allSelected {
-                                Image(systemName: "checkmark")
-                                    .foregroundStyle(.accent)
+                            if allKitsSelected {
+                                Image(systemName: "checkmark").foregroundStyle(.accent)
+                            }
+                        }
+                    }
+                }
+
+                if !bundles.isEmpty {
+                    Section("Bundles") {
+                        ForEach(bundles.sorted { $0.name < $1.name }) { bundle in
+                            Button {
+                                if selectedBundleIDs.contains(bundle.persistentModelID) {
+                                    selectedBundleIDs.remove(bundle.persistentModelID)
+                                } else {
+                                    selectedBundleIDs.insert(bundle.persistentModelID)
+                                }
+                            } label: {
+                                HStack {
+                                    Image(systemName: bundle.kitIcon)
+                                        .foregroundStyle(bundle.iconColor)
+                                        .frame(width: 24)
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text(bundle.name)
+                                            .foregroundStyle(.primary)
+                                        Text("\(bundle.kits.count) kit\(bundle.kits.count == 1 ? "" : "s") · \(bundle.totalItemCount) items")
+                                            .font(.caption)
+                                            .foregroundStyle(.secondary)
+                                    }
+                                    Spacer()
+                                    if selectedBundleIDs.contains(bundle.persistentModelID) {
+                                        Image(systemName: "checkmark").foregroundStyle(.accent)
+                                    }
+                                }
                             }
                         }
                     }
@@ -548,15 +617,14 @@ private struct KitPickerSheet: View {
                                     .font(.caption)
                                     .foregroundStyle(.secondary)
                                 if selectedKitIDs.contains(kit.persistentModelID) {
-                                    Image(systemName: "checkmark")
-                                        .foregroundStyle(.accent)
+                                    Image(systemName: "checkmark").foregroundStyle(.accent)
                                 }
                             }
                         }
                     }
                 }
             }
-            .navigationTitle("Attach Kits")
+            .navigationTitle("Attach Context")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
@@ -565,7 +633,7 @@ private struct KitPickerSheet: View {
             }
             .safeAreaInset(edge: .bottom) {
                 if totalItems > 0 {
-                    Text("\(totalItems) items across \(selectedKitIDs.count) kit\(selectedKitIDs.count == 1 ? "" : "s") attached")
+                    Text("\(totalItems) items attached")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                         .padding(.vertical, 8)

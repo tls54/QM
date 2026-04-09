@@ -4,8 +4,11 @@ import SwiftData
 struct KitListView: View {
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \Kit.createdAt) private var kits: [Kit]
+    @Query(sort: \KitBundle.createdAt) private var bundles: [KitBundle]
     @State private var showingAddKit = false
     @State private var editingKit: Kit?
+    @State private var showingAddBundle = false
+    @State private var editingBundle: KitBundle?
 
     private var storeKit: Kit? { kits.first(where: { $0.isStore }) }
     private var regularKits: [Kit] { kits.filter { !$0.isStore } }
@@ -25,6 +28,44 @@ struct KitListView: View {
     var body: some View {
         NavigationStack {
             List {
+                // Bundles
+                Section {
+                    if bundles.isEmpty {
+                        Text("No bundles yet — tap + to create one.")
+                            .foregroundStyle(.secondary)
+                            .font(.subheadline)
+                    } else {
+                        ForEach(bundles.sorted { $0.name < $1.name }) { bundle in
+                            NavigationLink(destination: BundleDetailView(bundle: bundle)) {
+                                BundleRowView(bundle: bundle)
+                            }
+                            .swipeActions(edge: .leading) {
+                                Button { editingBundle = bundle } label: {
+                                    Label("Edit", systemImage: "pencil")
+                                }
+                                .tint(.blue)
+                            }
+                            .swipeActions(edge: .trailing) {
+                                Button(role: .destructive) {
+                                    modelContext.delete(bundle)
+                                } label: {
+                                    Label("Delete", systemImage: "trash")
+                                }
+                            }
+                        }
+                    }
+                } header: {
+                    HStack {
+                        Text("Bundles")
+                        Spacer()
+                        Button { showingAddBundle = true } label: {
+                            Image(systemName: "plus.circle")
+                        }
+                    }
+                    .textCase(nil)
+                }
+
+                // Store
                 if let store = storeKit {
                     Section("Store") {
                         NavigationLink(destination: KitDetailView(kit: store)) {
@@ -33,6 +74,7 @@ struct KitListView: View {
                     }
                 }
 
+                // Kits by category
                 if regularKits.isEmpty {
                     Section {
                         Text("No kits yet — tap + to add one.")
@@ -59,6 +101,24 @@ struct KitListView: View {
                                         Label("Delete", systemImage: "trash")
                                     }
                                 }
+                                .contextMenu {
+                                    if bundles.isEmpty {
+                                        Button { showingAddBundle = true } label: {
+                                            Label("New Bundle", systemImage: "plus")
+                                        }
+                                    } else {
+                                        ForEach(bundles.sorted { $0.name < $1.name }) { bundle in
+                                            Button { toggle(kit: kit, in: bundle) } label: {
+                                                let isIn = bundle.kits.contains(where: { $0.persistentModelID == kit.persistentModelID })
+                                                Label(bundle.name, systemImage: isIn ? "checkmark" : "square")
+                                            }
+                                        }
+                                        Divider()
+                                        Button { showingAddBundle = true } label: {
+                                            Label("New Bundle", systemImage: "plus")
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
@@ -78,15 +138,29 @@ struct KitListView: View {
             .sheet(item: $editingKit) { kit in
                 AddEditKitView(kit: kit)
             }
+            .sheet(isPresented: $showingAddBundle) {
+                AddEditBundleView()
+            }
+            .sheet(item: $editingBundle) { bundle in
+                AddEditBundleView(bundle: bundle)
+            }
             .task {
                 guard !kits.contains(where: { $0.isStore }) else { return }
                 modelContext.insert(Kit(name: "Store", isStore: true))
             }
         }
     }
+
+    private func toggle(kit: Kit, in bundle: KitBundle) {
+        if bundle.kits.contains(where: { $0.persistentModelID == kit.persistentModelID }) {
+            bundle.kits.removeAll { $0.persistentModelID == kit.persistentModelID }
+        } else {
+            bundle.kits.append(kit)
+        }
+    }
 }
 
-private struct KitRowView: View {
+struct KitRowView: View {
     let kit: Kit
 
     var body: some View {
@@ -136,7 +210,32 @@ private struct KitRowView: View {
     }
 }
 
+private struct BundleRowView: View {
+    let bundle: KitBundle
+
+    var body: some View {
+        HStack(spacing: 14) {
+            Image(systemName: bundle.kitIcon)
+                .font(.title2)
+                .foregroundStyle(bundle.iconColor)
+                .frame(width: 32)
+
+            VStack(alignment: .leading, spacing: 3) {
+                Text(bundle.name)
+                    .font(.body)
+
+                let kitCount = bundle.kits.count
+                let itemCount = bundle.totalItemCount
+                Text("\(kitCount) kit\(kitCount == 1 ? "" : "s") · \(itemCount) item\(itemCount == 1 ? "" : "s")")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .padding(.vertical, 4)
+    }
+}
+
 #Preview {
     KitListView()
-        .modelContainer(for: [Kit.self, KitItem.self], inMemory: true)
+        .modelContainer(for: [Kit.self, KitItem.self, KitBundle.self, BundleItem.self], inMemory: true)
 }
