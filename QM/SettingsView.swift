@@ -10,6 +10,7 @@ struct SettingsView: View {
     @AppStorage("secretKey")              private var secretKey = ""
     @AppStorage("selectedModel")          private var selectedModel = ""
     @AppStorage("medicalFeaturesEnabled") private var medicalFeaturesEnabled = false
+    @AppStorage("llmChangeMode")          private var llmChangeMode = "off"
 
     @Environment(\.modelContext) private var modelContext
     @Query private var kits: [Kit]
@@ -129,6 +130,17 @@ struct SettingsView: View {
                          ? "Using server default model (qwen/qwen3-32b). Load models to override."
                          : "Using \(selectedModel). Select \"Server default\" to revert."
                     )
+                }
+
+                Section {
+                    Picker("Kit Change Proposals", selection: $llmChangeMode) {
+                        Text("Off").tag("off")
+                        Text("Apply with Approval").tag("apply")
+                    }
+                } header: {
+                    Text("AI Kit Changes")
+                } footer: {
+                    Text("When enabled, the assistant may propose changes to your kits at the end of a response. You review and approve each change before it's applied.")
                 }
 
                 Section {

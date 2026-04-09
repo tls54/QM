@@ -37,6 +37,7 @@ class AskRequest(BaseModel):
     history: list[ConversationMessage] = []
     use_rag: bool = True       # set False to skip knowledge base retrieval
     model: Optional[str] = None  # overrides server default if provided
+    change_mode: str = "off"   # "off" | "apply"
 
 
 class AskResponse(BaseModel):

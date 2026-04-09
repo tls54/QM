@@ -9,6 +9,7 @@ struct AssistantView: View {
 
     @AppStorage("hasAcknowledgedAIDisclaimer") private var hasAcknowledgedDisclaimer = false
     @AppStorage("medicalFeaturesEnabled") private var medicalFeaturesEnabled = false
+    @AppStorage("llmChangeMode") private var llmChangeMode = "off"
 
     @State private var messages: [ChatMessage] = []
     @State private var input = ""
@@ -25,6 +26,7 @@ struct AssistantView: View {
     @State private var searchResults: [FirstAidChunk] = []
     @State private var hasSearched = false
     @State private var showingPromptLibrary = false
+    @State private var pendingChangeset: Changeset?
 
     private var contextBundles: [KitBundle] {
         bundles.filter { selectedBundleIDs.contains($0.persistentModelID) }
@@ -40,6 +42,13 @@ struct AssistantView: View {
 
     private var hasAttachments: Bool {
         !selectedKitIDs.isEmpty || !selectedBundleIDs.isEmpty
+    }
+
+    private var streamingDisplayContent: String {
+        if let start = streamingContent.range(of: "<changeset>") {
+            return String(streamingContent[..<start.lowerBound]).trimmingCharacters(in: .whitespacesAndNewlines)
+        }
+        return streamingContent
     }
 
     var body: some View {
@@ -76,7 +85,7 @@ struct AssistantView: View {
                                         .id(message.id)
                                 }
                                 if isLoading && !streamingContent.isEmpty {
-                                    ChatBubble(message: ChatMessage(role: .assistant, content: streamingContent))
+                                    ChatBubble(message: ChatMessage(role: .assistant, content: streamingDisplayContent))
                                         .id("streaming")
                                 } else if isLoading {
                                     TypingIndicator()
@@ -230,6 +239,9 @@ struct AssistantView: View {
                     input = prompt
                 }
             }
+            .sheet(item: $pendingChangeset) { changeset in
+                ChangesetDiffView(changeset: changeset)
+            }
             .sheet(isPresented: $showingHistory) {
                 ChatHistorySheet(
                     conversations: conversations,
@@ -373,17 +385,22 @@ struct AssistantView: View {
         let kitsSnapshot = contextKits
         let modeSnapshot = mode.rawValue
         let useRAGSnapshot = useKnowledgeBase
+        let changeModeSnapshot = llmChangeMode
 
         Task {
             do {
-                let stream = APIClient.shared.stream(query: query, mode: modeSnapshot, kits: kitsSnapshot, history: history, useRAG: useRAGSnapshot)
+                let stream = APIClient.shared.stream(query: query, mode: modeSnapshot, kits: kitsSnapshot, history: history, useRAG: useRAGSnapshot, changeMode: changeModeSnapshot)
                 for try await token in stream {
                     streamingContent += token
                 }
-                let assistantMessage = ChatMessage(role: .assistant, content: streamingContent)
+                let (cleanText, changeset) = Changeset.parse(from: streamingContent)
+                let assistantMessage = ChatMessage(role: .assistant, content: cleanText)
                 messages.append(assistantMessage)
                 persistMessage(assistantMessage)
                 streamingContent = ""
+                if let changeset {
+                    pendingChangeset = changeset
+                }
             } catch {
                 self.error = error.localizedDescription
                 streamingContent = ""
