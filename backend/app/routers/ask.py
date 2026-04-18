@@ -81,8 +81,11 @@ Include a changeset only when proposing concrete, actionable changes (e.g. "add 
 ]}
 </changeset>
 
-Rules:
-- Kit names MUST exactly match names from the user's inventory above
+Rules — read carefully:
+- ONLY include a changeset when the user has EXPLICITLY asked you to modify their kit (e.g. "add X to my kit", "can you add those items?", "update my inventory with these"). General questions, planning discussions, and advice responses do NOT warrant a changeset.
+- A user saying "I'm thinking of making a kit for X" or "what would I need for Y?" is NOT an explicit request to apply changes — do not include a changeset.
+- If you mention items in your advice but the user hasn't asked you to add them, do not include a changeset.
+- Kit names MUST exactly match names from the user's inventory above — do not invent or paraphrase kit names.
 - Valid categories: Wound Care, Sanitisation, Medications, Airway & Breathing, Immobilisation, Footcare, Tools & Equipment, Navigation, Shelter, Cooking & Water, Lighting, Communication, Other
 - JSON must be valid — no trailing commas, no comments
 - Place the changeset block at the very end of your response, after all text
@@ -112,6 +115,6 @@ async def ask(request: AskRequest) -> StreamingResponse:
     system_prompt = _build_system_prompt(request.mode, context_chunks, inventory_summary, request.change_mode)
     history = [{"role": m.role, "content": m.content} for m in request.history]
 
-    chunks = llm.stream(system_prompt=system_prompt, history=history, user_message=request.query, model=request.model)
+    chunks = llm.stream(system_prompt=system_prompt, history=history, user_message=request.query, model=request.model, reasoning_effort=request.reasoning_effort)
 
     return StreamingResponse(_sse_generator(chunks), media_type="text/event-stream")

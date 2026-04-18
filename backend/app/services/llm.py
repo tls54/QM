@@ -1,6 +1,12 @@
 from groq import Groq
 from app.config import get_settings
 
+# Models known to support the reasoning_effort parameter on Groq.
+# Silently ignored for all other models to avoid bad request errors.
+THINKING_MODELS: set[str] = {
+    "qwen/qwen3-32b",
+}
+
 _client: Groq | None = None
 
 
@@ -33,15 +39,25 @@ def _base_kwargs(messages: list[dict]) -> dict:
     return kwargs
 
 
-def stream(system_prompt: str, history: list[dict], user_message: str, model: str | None = None):
+def stream(system_prompt: str, history: list[dict], user_message: str, model: str | None = None, reasoning_effort: str | None = None):
     """Return a Groq streaming completion iterator."""
     client = get_client()
     messages = _build_messages(system_prompt, history, user_message)
     kwargs = _base_kwargs(messages)
+
+    active_model = model or kwargs["model"]
+
     if model:
-        # User-selected model override — use it and drop reasoning_effort since
-        # that parameter is only supported by specific models.
         kwargs["model"] = model
+
+    # Apply reasoning_effort only for models known to support it.
+    # If the client sent an explicit value, it overrides the server default.
+    if active_model in THINKING_MODELS:
+        if reasoning_effort is not None:
+            kwargs["reasoning_effort"] = reasoning_effort
+        # else: keep whatever _base_kwargs set (server default from env)
+    else:
         kwargs.pop("reasoning_effort", None)
+
     kwargs["stream"] = True
     return client.chat.completions.create(**kwargs, timeout=25)

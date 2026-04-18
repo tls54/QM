@@ -9,7 +9,8 @@ struct AssistantView: View {
 
     @AppStorage("hasAcknowledgedAIDisclaimer") private var hasAcknowledgedDisclaimer = false
     @AppStorage("medicalFeaturesEnabled") private var medicalFeaturesEnabled = false
-    @AppStorage("llmChangeMode") private var llmChangeMode = "off"
+    @AppStorage("llmChangeMode")      private var llmChangeMode = "off"
+    @AppStorage("reasoningEffort")    private var reasoningEffort = "default"
 
     @State private var messages: [ChatMessage] = []
     @State private var input = ""
@@ -44,11 +45,24 @@ struct AssistantView: View {
         !selectedKitIDs.isEmpty || !selectedBundleIDs.isEmpty
     }
 
+    // True while the model is still inside a <think>…</think> block
+    private var isThinking: Bool {
+        streamingContent.contains("<think>") && !streamingContent.contains("</think>")
+    }
+
     private var streamingDisplayContent: String {
-        if let start = streamingContent.range(of: "<changeset>") {
-            return String(streamingContent[..<start.lowerBound]).trimmingCharacters(in: .whitespacesAndNewlines)
+        var text = streamingContent
+        // Strip completed thinking block
+        if let endRange = text.range(of: "</think>") {
+            text = String(text[endRange.upperBound...]).trimmingCharacters(in: .whitespacesAndNewlines)
+        } else if text.contains("<think>") {
+            return ""   // Still inside thinking block — nothing to show yet
         }
-        return streamingContent
+        // Strip in-progress changeset block
+        if let start = text.range(of: "<changeset>") {
+            text = String(text[..<start.lowerBound]).trimmingCharacters(in: .whitespacesAndNewlines)
+        }
+        return text
     }
 
     var body: some View {
@@ -84,7 +98,10 @@ struct AssistantView: View {
                                     ChatBubble(message: message)
                                         .id(message.id)
                                 }
-                                if isLoading && !streamingContent.isEmpty {
+                                if isLoading && isThinking {
+                                    ThinkingIndicator()
+                                        .id("typing")
+                                } else if isLoading && !streamingDisplayContent.isEmpty {
                                     ChatBubble(message: ChatMessage(role: .assistant, content: streamingDisplayContent))
                                         .id("streaming")
                                 } else if isLoading {
@@ -386,15 +403,16 @@ struct AssistantView: View {
         let modeSnapshot = mode.rawValue
         let useRAGSnapshot = useKnowledgeBase
         let changeModeSnapshot = llmChangeMode
+        let reasoningEffortSnapshot = reasoningEffort == "off" ? "none" : reasoningEffort
 
         Task {
             do {
-                let stream = APIClient.shared.stream(query: query, mode: modeSnapshot, kits: kitsSnapshot, history: history, useRAG: useRAGSnapshot, changeMode: changeModeSnapshot)
+                let stream = APIClient.shared.stream(query: query, mode: modeSnapshot, kits: kitsSnapshot, history: history, useRAG: useRAGSnapshot, changeMode: changeModeSnapshot, reasoningEffort: reasoningEffortSnapshot)
                 for try await token in stream {
                     streamingContent += token
                 }
-                let (cleanText, changeset) = Changeset.parse(from: streamingContent)
-                let assistantMessage = ChatMessage(role: .assistant, content: cleanText)
+                let (cleanText, thinking, changeset) = parseResponse(streamingContent)
+                let assistantMessage = ChatMessage(role: .assistant, content: cleanText, thinking: thinking)
                 messages.append(assistantMessage)
                 persistMessage(assistantMessage)
                 streamingContent = ""
@@ -407,6 +425,24 @@ struct AssistantView: View {
             }
             isLoading = false
         }
+    }
+
+    // MARK: - Response parsing
+
+    private func parseResponse(_ raw: String) -> (cleanText: String, thinking: String?, changeset: Changeset?) {
+        var text = raw
+
+        // Extract <think>…</think>
+        var thinking: String? = nil
+        if let s = text.range(of: "<think>"), let e = text.range(of: "</think>"), s.upperBound <= e.lowerBound {
+            let extracted = String(text[s.upperBound..<e.lowerBound]).trimmingCharacters(in: .whitespacesAndNewlines)
+            thinking = extracted.isEmpty ? nil : extracted
+            text = (String(text[..<s.lowerBound]) + String(text[e.upperBound...])).trimmingCharacters(in: .whitespacesAndNewlines)
+        }
+
+        // Extract <changeset>…</changeset>
+        let (cleanText, changeset) = Changeset.parse(from: text)
+        return (cleanText, thinking, changeset)
     }
 
     // MARK: - Persistence
@@ -740,6 +776,7 @@ struct ChatMessage: Identifiable {
     let id = UUID()
     let role: Role
     let content: String
+    var thinking: String? = nil
 
     enum Role { case user, assistant }
 }
@@ -830,6 +867,7 @@ private struct SearchResultRow: View {
 
 private struct ChatBubble: View {
     let message: ChatMessage
+    @State private var thinkingExpanded = false
 
     var isUser: Bool { message.role == .user }
 
@@ -845,29 +883,70 @@ private struct ChatBubble: View {
     }
 
     var body: some View {
-        HStack {
+        HStack(alignment: .top) {
             if isUser { Spacer(minLength: 48) }
-            Group {
-                if isUser {
-                    Text(message.content)
-                } else {
-                    assistantContent
+            VStack(alignment: isUser ? .trailing : .leading, spacing: 6) {
+                // Collapsible thinking block
+                if let thinking = message.thinking, !thinking.isEmpty {
+                    DisclosureGroup(isExpanded: $thinkingExpanded) {
+                        Text(thinking)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.top, 4)
+                    } label: {
+                        Label("Thinking", systemImage: "brain")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 8)
+                    .background(Color(.tertiarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 12))
                 }
-            }
-            .padding(.horizontal, 14)
-            .padding(.vertical, 10)
-            .background(isUser ? Color.accentColor : Color(.secondarySystemGroupedBackground),
-                        in: RoundedRectangle(cornerRadius: 18))
-            .foregroundStyle(isUser ? .white : .primary)
-            .contextMenu {
-                Button {
-                    UIPasteboard.general.string = message.content
-                } label: {
-                    Label("Copy", systemImage: "doc.on.doc")
+
+                // Main message bubble
+                Group {
+                    if isUser {
+                        Text(message.content)
+                    } else {
+                        assistantContent
+                    }
+                }
+                .padding(.horizontal, 14)
+                .padding(.vertical, 10)
+                .background(isUser ? Color.accentColor : Color(.secondarySystemGroupedBackground),
+                            in: RoundedRectangle(cornerRadius: 18))
+                .foregroundStyle(isUser ? .white : .primary)
+                .contextMenu {
+                    Button {
+                        UIPasteboard.general.string = message.content
+                    } label: {
+                        Label("Copy", systemImage: "doc.on.doc")
+                    }
                 }
             }
             if !isUser { Spacer(minLength: 48) }
         }
+    }
+}
+
+private struct ThinkingIndicator: View {
+    @State private var opacity = 0.4
+
+    var body: some View {
+        HStack(spacing: 6) {
+            Image(systemName: "brain")
+                .font(.caption)
+            Text("Thinking…")
+                .font(.caption)
+        }
+        .foregroundStyle(Color.secondary)
+        .opacity(opacity)
+        .animation(.easeInOut(duration: 0.9).repeatForever(autoreverses: true), value: opacity)
+        .padding(.horizontal, 14)
+        .padding(.vertical, 10)
+        .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 18))
+        .onAppear { opacity = 1.0 }
     }
 }
 

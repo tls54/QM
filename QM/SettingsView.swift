@@ -11,6 +11,7 @@ struct SettingsView: View {
     @AppStorage("selectedModel")          private var selectedModel = ""
     @AppStorage("medicalFeaturesEnabled") private var medicalFeaturesEnabled = false
     @AppStorage("llmChangeMode")          private var llmChangeMode = "off"
+    @AppStorage("reasoningEffort")        private var reasoningEffort = "default"
 
     @Environment(\.modelContext) private var modelContext
     @Query private var kits: [Kit]
@@ -130,6 +131,18 @@ struct SettingsView: View {
                          ? "Using server default model (qwen/qwen3-32b). Load models to override."
                          : "Using \(selectedModel). Select \"Server default\" to revert."
                     )
+                }
+
+                Section {
+                    Picker("Thinking", selection: $reasoningEffort) {
+                        Text("Off").tag("off")
+                        Text("Default").tag("default")
+                        Text("Turbo").tag("turbo")
+                    }
+                } header: {
+                    Text("Thinking")
+                } footer: {
+                    Text("Controls reasoning effort for models that support it (e.g. qwen3-32b). Turbo is slower but more thorough. Has no effect on models that don't support thinking.")
                 }
 
                 Section {

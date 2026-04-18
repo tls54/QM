@@ -34,6 +34,7 @@ private struct AskRequestDTO: Encodable {
     let use_rag: Bool
     let model: String?
     let change_mode: String
+    let reasoning_effort: String?  // "none" | "default" | "turbo" | nil
 }
 
 struct GroqModel: Decodable, Identifiable, Hashable {
@@ -66,7 +67,7 @@ struct APIClient {
         return key
     }
 
-    private func buildRequest(query: String, mode: String, kits: [Kit], history: [ConversationMessageDTO], useRAG: Bool = true, changeMode: String = "off") throws -> URLRequest {
+    private func buildRequest(query: String, mode: String, kits: [Kit], history: [ConversationMessageDTO], useRAG: Bool = true, changeMode: String = "off", reasoningEffort: String? = nil) throws -> URLRequest {
         let base = try baseURL()
         let key = try secretKey()
         guard let url = URL(string: base + "/ask") else { throw APIError.backendNotConfigured }
@@ -89,7 +90,7 @@ struct APIClient {
         })
 
         let selectedModel = UserDefaults.standard.string(forKey: "selectedModel")
-        let body = AskRequestDTO(query: query, mode: mode, inventory: inventory, history: history, use_rag: useRAG, model: selectedModel, change_mode: changeMode)
+        let body = AskRequestDTO(query: query, mode: mode, inventory: inventory, history: history, use_rag: useRAG, model: selectedModel, change_mode: changeMode, reasoning_effort: reasoningEffort)
 
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
@@ -114,11 +115,11 @@ struct APIClient {
 
     // MARK: - Streaming
 
-    func stream(query: String, mode: String, kits: [Kit], history: [ConversationMessageDTO] = [], useRAG: Bool = true, changeMode: String = "off") -> AsyncThrowingStream<String, Error> {
+    func stream(query: String, mode: String, kits: [Kit], history: [ConversationMessageDTO] = [], useRAG: Bool = true, changeMode: String = "off", reasoningEffort: String? = nil) -> AsyncThrowingStream<String, Error> {
         AsyncThrowingStream { continuation in
             let streamTask = Task {
                 do {
-                    let request = try buildRequest(query: query, mode: mode, kits: kits, history: history, useRAG: useRAG, changeMode: changeMode)
+                    let request = try buildRequest(query: query, mode: mode, kits: kits, history: history, useRAG: useRAG, changeMode: changeMode, reasoningEffort: reasoningEffort)
                     let (bytes, response) = try await URLSession.shared.bytes(for: request)
                     guard let http = response as? HTTPURLResponse, http.statusCode == 200 else {
                         continuation.finish(throwing: APIError.badResponse((response as? HTTPURLResponse)?.statusCode ?? 0))
