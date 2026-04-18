@@ -72,6 +72,40 @@ struct ChangeOperation: Decodable, Identifiable {
     }
 }
 
+// MARK: - Shopping additions (auto-applied, no confirmation)
+
+struct ShoppingAdditionItem: Decodable {
+    let name: String
+    let notes: String?
+}
+
+struct ShoppingAdditions: Decodable {
+    let items: [ShoppingAdditionItem]
+
+    static func parse(from text: String) -> (cleanText: String, additions: ShoppingAdditions?) {
+        let openTag = "<shopping>"
+        let closeTag = "</shopping>"
+        guard let startRange = text.range(of: openTag),
+              let endRange = text.range(of: closeTag),
+              startRange.upperBound <= endRange.lowerBound else {
+            return (text, nil)
+        }
+        let jsonString = String(text[startRange.upperBound..<endRange.lowerBound])
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        let cleanText = (String(text[..<startRange.lowerBound]) + String(text[endRange.upperBound...]))
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+
+        guard let data = jsonString.data(using: .utf8),
+              let additions = try? JSONDecoder().decode(ShoppingAdditions.self, from: data),
+              !additions.items.isEmpty else {
+            return (cleanText.isEmpty ? text : cleanText, nil)
+        }
+        return (cleanText, additions)
+    }
+}
+
+// MARK: - Kit changeset (approval required)
+
 struct Changeset: Decodable, Identifiable {
     let id = UUID()
     let operations: [ChangeOperation]

@@ -21,6 +21,12 @@ private struct InventoryContextDTO: Encodable {
     let kits: [KitDTO]
 }
 
+private struct ShoppingItemDTO: Encodable {
+    let name: String
+    let notes: String?
+    let status: String
+}
+
 struct ConversationMessageDTO: Encodable {
     let role: String
     let content: String
@@ -30,11 +36,13 @@ private struct AskRequestDTO: Encodable {
     let query: String
     let mode: String
     let inventory: InventoryContextDTO?
+    let shopping_list: [ShoppingItemDTO]
+    let shopping_list_enabled: Bool
     let history: [ConversationMessageDTO]
     let use_rag: Bool
     let model: String?
     let change_mode: String
-    let reasoning_effort: String?  // "none" | "default" | "turbo" | nil
+    let reasoning_effort: String?
 }
 
 struct GroqModel: Decodable, Identifiable, Hashable {
@@ -67,7 +75,7 @@ struct APIClient {
         return key
     }
 
-    private func buildRequest(query: String, mode: String, kits: [Kit], history: [ConversationMessageDTO], useRAG: Bool = true, changeMode: String = "off", reasoningEffort: String? = nil) throws -> URLRequest {
+    private func buildRequest(query: String, mode: String, kits: [Kit], shoppingItems: [ShoppingItem], shoppingListEnabled: Bool, history: [ConversationMessageDTO], useRAG: Bool = true, changeMode: String = "off", reasoningEffort: String? = nil) throws -> URLRequest {
         let base = try baseURL()
         let key = try secretKey()
         guard let url = URL(string: base + "/ask") else { throw APIError.backendNotConfigured }
@@ -90,7 +98,11 @@ struct APIClient {
         })
 
         let selectedModel = UserDefaults.standard.string(forKey: "selectedModel")
-        let body = AskRequestDTO(query: query, mode: mode, inventory: inventory, history: history, use_rag: useRAG, model: selectedModel, change_mode: changeMode, reasoning_effort: reasoningEffort)
+        let shoppingList = shoppingItems
+            .filter { $0.status != .acquired }
+            .map { ShoppingItemDTO(name: $0.name, notes: $0.notes.isEmpty ? nil : $0.notes, status: $0.statusRaw) }
+
+        let body = AskRequestDTO(query: query, mode: mode, inventory: inventory, shopping_list: shoppingList, shopping_list_enabled: shoppingListEnabled, history: history, use_rag: useRAG, model: selectedModel, change_mode: changeMode, reasoning_effort: reasoningEffort)
 
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
@@ -115,11 +127,11 @@ struct APIClient {
 
     // MARK: - Streaming
 
-    func stream(query: String, mode: String, kits: [Kit], history: [ConversationMessageDTO] = [], useRAG: Bool = true, changeMode: String = "off", reasoningEffort: String? = nil) -> AsyncThrowingStream<String, Error> {
+    func stream(query: String, mode: String, kits: [Kit], shoppingItems: [ShoppingItem] = [], shoppingListEnabled: Bool = false, history: [ConversationMessageDTO] = [], useRAG: Bool = true, changeMode: String = "off", reasoningEffort: String? = nil) -> AsyncThrowingStream<String, Error> {
         AsyncThrowingStream { continuation in
             let streamTask = Task {
                 do {
-                    let request = try buildRequest(query: query, mode: mode, kits: kits, history: history, useRAG: useRAG, changeMode: changeMode, reasoningEffort: reasoningEffort)
+                    let request = try buildRequest(query: query, mode: mode, kits: kits, shoppingItems: shoppingItems, shoppingListEnabled: shoppingListEnabled, history: history, useRAG: useRAG, changeMode: changeMode, reasoningEffort: reasoningEffort)
                     let (bytes, response) = try await URLSession.shared.bytes(for: request)
                     guard let http = response as? HTTPURLResponse, http.statusCode == 200 else {
                         continuation.finish(throwing: APIError.badResponse((response as? HTTPURLResponse)?.statusCode ?? 0))

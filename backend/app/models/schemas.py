@@ -30,15 +30,23 @@ class ConversationMessage(BaseModel):
     content: str
 
 
+class ShoppingItemContext(BaseModel):
+    name: str
+    notes: Optional[str] = None
+    status: str  # "needed" | "ordered"
+
+
 class AskRequest(BaseModel):
     query: str
-    mode: str = "ask"          # "ask" | "emergency"
+    mode: str = "ask"          # "ask" | "search" (emergency mode removed)
     inventory: Optional[InventoryContext] = None
+    shopping_list: list[ShoppingItemContext] = []
     history: list[ConversationMessage] = []
     use_rag: bool = True       # set False to skip knowledge base retrieval
     model: Optional[str] = None  # overrides server default if provided
+    shopping_list_enabled: bool = False    # whether LLM has shopping list write access
     change_mode: str = "off"               # "off" | "apply"
-    reasoning_effort: Optional[str] = None  # "none" | "default" | "turbo"
+    reasoning_effort: Optional[str] = None  # "none" | "low" | "medium" | "high"
 
 
 class AskResponse(BaseModel):

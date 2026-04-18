@@ -11,6 +11,8 @@ struct SettingsView: View {
     @AppStorage("selectedModel")          private var selectedModel = ""
     @AppStorage("medicalFeaturesEnabled") private var medicalFeaturesEnabled = false
     @AppStorage("llmChangeMode")          private var llmChangeMode = "off"
+    @AppStorage("llmShoppingListVisible") private var llmShoppingListVisible = true
+    @AppStorage("llmShoppingListEnabled") private var llmShoppingListEnabled = false
     @AppStorage("reasoningEffort")        private var reasoningEffort = "medium"
 
     @Environment(\.modelContext) private var modelContext
@@ -144,6 +146,16 @@ struct SettingsView: View {
                     Text("Thinking")
                 } footer: {
                     Text("Controls reasoning effort for models that support it (e.g. qwen3-32b). Higher effort is slower but more thorough. Has no effect on models that don't support thinking.")
+                }
+
+                Section {
+                    Toggle("Show Shopping List", isOn: $llmShoppingListVisible)
+                    Toggle("Allow List Edits", isOn: $llmShoppingListEnabled)
+                        .disabled(!llmShoppingListVisible)
+                } header: {
+                    Text("AI Shopping List")
+                } footer: {
+                    Text("Show: assistant can see your shopping list and avoid re-suggesting items. Edits: assistant can also add new items to the list automatically.")
                 }
 
                 Section {

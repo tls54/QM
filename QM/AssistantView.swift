@@ -4,13 +4,16 @@ import SwiftData
 struct AssistantView: View {
     @Query private var kits: [Kit]
     @Query private var bundles: [KitBundle]
+    @Query private var shoppingItems: [ShoppingItem]
     @Query(sort: \Conversation.updatedAt, order: .reverse) private var conversations: [Conversation]
     @Environment(\.modelContext) private var modelContext
 
     @AppStorage("hasAcknowledgedAIDisclaimer") private var hasAcknowledgedDisclaimer = false
     @AppStorage("medicalFeaturesEnabled") private var medicalFeaturesEnabled = false
-    @AppStorage("llmChangeMode")      private var llmChangeMode = "off"
-    @AppStorage("reasoningEffort")    private var reasoningEffort = "medium"
+    @AppStorage("llmChangeMode")          private var llmChangeMode = "off"
+    @AppStorage("reasoningEffort")        private var reasoningEffort = "medium"
+    @AppStorage("llmShoppingListVisible") private var llmShoppingListVisible = true
+    @AppStorage("llmShoppingListEnabled") private var llmShoppingListEnabled = false
 
     @State private var messages: [ChatMessage] = []
     @State private var input = ""
@@ -58,9 +61,12 @@ struct AssistantView: View {
         } else if text.contains("<think>") {
             return ""   // Still inside thinking block — nothing to show yet
         }
-        // Strip in-progress changeset block
-        if let start = text.range(of: "<changeset>") {
-            text = String(text[..<start.lowerBound]).trimmingCharacters(in: .whitespacesAndNewlines)
+        // Strip in-progress shopping or changeset blocks
+        for tag in ["<shopping>", "<changeset>"] {
+            if let start = text.range(of: tag) {
+                text = String(text[..<start.lowerBound]).trimmingCharacters(in: .whitespacesAndNewlines)
+                break
+            }
         }
         return text
     }
@@ -414,21 +420,21 @@ struct AssistantView: View {
         let useRAGSnapshot = useKnowledgeBase
         let changeModeSnapshot = llmChangeMode
         let reasoningEffortSnapshot = reasoningEffort == "off" ? "none" : reasoningEffort
+        let shoppingItemsSnapshot = llmShoppingListVisible ? shoppingItems : []
 
         Task {
             do {
-                let stream = APIClient.shared.stream(query: query, mode: modeSnapshot, kits: kitsSnapshot, history: history, useRAG: useRAGSnapshot, changeMode: changeModeSnapshot, reasoningEffort: reasoningEffortSnapshot)
+                let stream = APIClient.shared.stream(query: query, mode: modeSnapshot, kits: kitsSnapshot, shoppingItems: shoppingItemsSnapshot, shoppingListEnabled: llmShoppingListEnabled, history: history, useRAG: useRAGSnapshot, changeMode: changeModeSnapshot, reasoningEffort: reasoningEffortSnapshot)
                 for try await token in stream {
                     streamingContent += token
                 }
-                let (cleanText, thinking, changeset) = parseResponse(streamingContent)
+                let (cleanText, thinking, additions, changeset) = parseResponse(streamingContent)
                 let assistantMessage = ChatMessage(role: .assistant, content: cleanText, thinking: thinking)
                 messages.append(assistantMessage)
                 persistMessage(assistantMessage)
                 streamingContent = ""
-                if let changeset {
-                    pendingChangeset = changeset
-                }
+                if let additions { applyShoppingAdditions(additions) }
+                if let changeset  { pendingChangeset = changeset }
             } catch {
                 self.error = error.localizedDescription
                 streamingContent = ""
@@ -439,7 +445,7 @@ struct AssistantView: View {
 
     // MARK: - Response parsing
 
-    private func parseResponse(_ raw: String) -> (cleanText: String, thinking: String?, changeset: Changeset?) {
+    private func parseResponse(_ raw: String) -> (cleanText: String, thinking: String?, additions: ShoppingAdditions?, changeset: Changeset?) {
         var text = raw
 
         // Extract <think>…</think>
@@ -450,9 +456,22 @@ struct AssistantView: View {
             text = (String(text[..<s.lowerBound]) + String(text[e.upperBound...])).trimmingCharacters(in: .whitespacesAndNewlines)
         }
 
-        // Extract <changeset>…</changeset>
+        // Extract <shopping>…</shopping> (auto-applied, no confirmation)
+        let (afterShopping, additions) = ShoppingAdditions.parse(from: text)
+        text = afterShopping
+
+        // Extract <changeset>…</changeset> (requires approval)
         let (cleanText, changeset) = Changeset.parse(from: text)
-        return (cleanText, thinking, changeset)
+        return (cleanText, thinking, additions, changeset)
+    }
+
+    private func applyShoppingAdditions(_ additions: ShoppingAdditions) {
+        let existingNames = Set(shoppingItems.map { $0.name.lowercased() })
+        for item in additions.items {
+            guard !existingNames.contains(item.name.lowercased()) else { continue }
+            let newItem = ShoppingItem(name: item.name, notes: item.notes ?? "", source: .llm)
+            modelContext.insert(newItem)
+        }
     }
 
     // MARK: - Persistence
@@ -549,7 +568,7 @@ private struct ChatHistorySheet: View {
                                     HStack(spacing: 8) {
                                         Label(
                                             conversation.mode.capitalized,
-                                            systemImage: conversation.mode == "emergency" ? "exclamationmark.triangle" : "bubble.left"
+                                            systemImage: "bubble.left"
                                         )
                                         .font(.caption)
                                         .foregroundStyle(.secondary)
