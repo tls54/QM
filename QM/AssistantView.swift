@@ -115,6 +115,15 @@ struct AssistantView: View {
                                         .padding(.horizontal)
                                         .id("error")
                                 }
+                                if !messages.isEmpty && !isLoading {
+                                    Text("QM can make mistakes. Not a substitute for medical training or professional advice.")
+                                        .font(.caption2)
+                                        .foregroundStyle(.tertiary)
+                                        .multilineTextAlignment(.center)
+                                        .frame(maxWidth: .infinity)
+                                        .padding(.top, 4)
+                                        .padding(.bottom, 8)
+                                }
                             }
                             .padding(.horizontal)
                             .padding(.top, 8)
@@ -220,12 +229,6 @@ struct AssistantView: View {
                 .padding(.vertical, 10)
                 .background(Color(.systemGroupedBackground))
 
-                Text("QM can make mistakes. Not a substitute for medical training or professional advice.")
-                    .font(.caption2)
-                    .foregroundStyle(.tertiary)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal)
-                    .padding(.bottom, 4)
             }
             .navigationTitle(currentConversation?.title ?? "Assistant")
             .navigationBarTitleDisplayMode(.inline)
@@ -317,6 +320,13 @@ struct AssistantView: View {
                     }
                     .font(.subheadline)
                     .foregroundStyle(.tint)
+
+                    Text("QM can make mistakes. Not a substitute for medical training or professional advice.")
+                        .font(.caption2)
+                        .foregroundStyle(.tertiary)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal)
+                        .padding(.top, 4)
                 }
             } else {
                 Image(systemName: "magnifyingglass")
