@@ -10,7 +10,7 @@ struct AssistantView: View {
     @AppStorage("hasAcknowledgedAIDisclaimer") private var hasAcknowledgedDisclaimer = false
     @AppStorage("medicalFeaturesEnabled") private var medicalFeaturesEnabled = false
     @AppStorage("llmChangeMode")      private var llmChangeMode = "off"
-    @AppStorage("reasoningEffort")    private var reasoningEffort = "default"
+    @AppStorage("reasoningEffort")    private var reasoningEffort = "medium"
 
     @State private var messages: [ChatMessage] = []
     @State private var input = ""

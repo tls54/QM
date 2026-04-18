@@ -52,9 +52,13 @@ def stream(system_prompt: str, history: list[dict], user_message: str, model: st
 
     # Apply reasoning_effort only for models known to support it.
     # If the client sent an explicit value, it overrides the server default.
+    _valid_efforts = {"none", "default", "low", "medium", "high"}
     if active_model in THINKING_MODELS:
-        if reasoning_effort is not None:
+        if reasoning_effort is not None and reasoning_effort in _valid_efforts:
             kwargs["reasoning_effort"] = reasoning_effort
+        elif reasoning_effort is not None:
+            # Unknown value — omit rather than let Groq reject the request
+            kwargs.pop("reasoning_effort", None)
         # else: keep whatever _base_kwargs set (server default from env)
     else:
         kwargs.pop("reasoning_effort", None)

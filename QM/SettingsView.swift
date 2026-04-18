@@ -11,7 +11,7 @@ struct SettingsView: View {
     @AppStorage("selectedModel")          private var selectedModel = ""
     @AppStorage("medicalFeaturesEnabled") private var medicalFeaturesEnabled = false
     @AppStorage("llmChangeMode")          private var llmChangeMode = "off"
-    @AppStorage("reasoningEffort")        private var reasoningEffort = "default"
+    @AppStorage("reasoningEffort")        private var reasoningEffort = "medium"
 
     @Environment(\.modelContext) private var modelContext
     @Query private var kits: [Kit]
@@ -136,13 +136,14 @@ struct SettingsView: View {
                 Section {
                     Picker("Thinking", selection: $reasoningEffort) {
                         Text("Off").tag("off")
-                        Text("Default").tag("default")
-                        Text("Turbo").tag("turbo")
+                        Text("Low").tag("low")
+                        Text("Medium").tag("medium")
+                        Text("High").tag("high")
                     }
                 } header: {
                     Text("Thinking")
                 } footer: {
-                    Text("Controls reasoning effort for models that support it (e.g. qwen3-32b). Turbo is slower but more thorough. Has no effect on models that don't support thinking.")
+                    Text("Controls reasoning effort for models that support it (e.g. qwen3-32b). Higher effort is slower but more thorough. Has no effect on models that don't support thinking.")
                 }
 
                 Section {
