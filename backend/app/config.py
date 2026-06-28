@@ -13,6 +13,11 @@ class Settings(BaseSettings):
     # ── API security ──────────────────────────────────────────────────────────
     secret_key: str  # Bearer token required on all protected endpoints
 
+    # ── Database ───────────────────────────────────────────────────────────────
+    # Postgres connection string. On Railway, reference the Postgres service's
+    # DATABASE_URL variable; locally, use the Railway "public" connection string.
+    database_url: str
+
     # ── Groq credentials ──────────────────────────────────────────────────────
     groq_api_key: str
 
