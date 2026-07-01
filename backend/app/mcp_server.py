@@ -5,9 +5,7 @@ DB sessions are opened per tool call and closed immediately after.
 """
 
 import os
-from contextlib import asynccontextmanager
 from datetime import date
-from typing import Annotated
 
 from mcp.server.fastmcp import FastMCP
 from mcp.server.transport_security import TransportSecuritySettings
@@ -21,6 +19,7 @@ _allowed_hosts = ["localhost", "localhost:*", "127.0.0.1", "127.0.0.1:*", *_extr
 
 mcp = FastMCP(
     "QM Kit Manager",
+    stateless_http=True,  # no in-memory sessions — survives redeployment without reconnecting
     transport_security=TransportSecuritySettings(
         enable_dns_rebinding_protection=True,
         allowed_hosts=_allowed_hosts,
