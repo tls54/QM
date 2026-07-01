@@ -12,6 +12,9 @@ dependencies = [
     "voyageai>=0.3",
     "sqlalchemy>=2.0",
     "psycopg[binary]>=3.2",
+    "pyjwt>=2.8",
+    "python-multipart>=0.0.9",
+    "mcp[cli]>=1.28",
 ]
 
 [project.optional-dependencies]
