@@ -30,14 +30,32 @@ app.include_router(models.router)
 app.include_router(inventory.router)
 
 def _mcp_auth_wrapper(asgi_app):
-    """Reject requests to /mcp without a valid JWT Bearer token."""
+    """Reject requests to /mcp without a valid JWT Bearer token.
+
+    The 401 includes a WWW-Authenticate header pointing to the resource
+    metadata URL so claude.ai can discover the OAuth server automatically.
+    """
     async def wrapped(scope, receive, send):
         if scope["type"] == "http":
             headers = dict(scope.get("headers", []))
+            host = headers.get(b"host", b"").decode()
+            # Infer scheme from forwarded headers (Railway terminates TLS)
+            scheme = "https" if headers.get(b"x-forwarded-proto", b"http").decode() == "https" else "http"
+            base = f"{scheme}://{host}"
+            resource_meta = f"{base}/.well-known/oauth-protected-resource"
+
             auth = headers.get(b"authorization", b"").decode()
             token = auth.removeprefix("Bearer ").strip() if auth.startswith("Bearer ") else ""
             if not token or verify_token(token) is None:
-                await send({"type": "http.response.start", "status": 401, "headers": []})
+                www_auth = f'Bearer realm="QM Kit Manager", resource_metadata="{resource_meta}"'
+                await send({
+                    "type": "http.response.start",
+                    "status": 401,
+                    "headers": [
+                        (b"www-authenticate", www_auth.encode()),
+                        (b"content-type", b"application/json"),
+                    ],
+                })
                 await send({"type": "http.response.body", "body": b'{"error":"Unauthorized"}'})
                 return
         await asgi_app(scope, receive, send)

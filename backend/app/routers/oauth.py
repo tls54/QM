@@ -2,13 +2,16 @@
 
 Endpoints
 ─────────
-GET  /.well-known/oauth-authorization-server   — metadata discovery (claude.ai reads this)
-GET  /oauth/authorize                           — consent page (HTML)
-POST /oauth/authorize                           — approve: validate password → redirect with code
-POST /oauth/token                               — exchange code or refresh token → JWT
-GET  /auth/device-token                         — one-time iOS bootstrap: SECRET_KEY → long-lived JWT
+GET  /.well-known/oauth-protected-resource     — resource metadata (MCP spec; claude.ai reads this first)
+GET  /.well-known/oauth-authorization-server   — auth server metadata discovery
+POST /oauth/register                           — Dynamic Client Registration (RFC 7591)
+GET  /oauth/authorize                          — consent page (HTML)
+POST /oauth/authorize                          — approve: validate password → redirect with code
+POST /oauth/token                              — exchange code or refresh token → JWT
+GET  /auth/device-token                        — one-time iOS bootstrap: SECRET_KEY → long-lived JWT
 """
 
+import time
 from urllib.parse import urlencode
 
 from fastapi import APIRouter, Depends, Form, HTTPException, Request, status
@@ -29,7 +32,19 @@ router = APIRouter()
 _bearer = HTTPBearer()
 
 
-# ── OAuth metadata discovery ──────────────────────────────────────────────────
+# ── Resource metadata (MCP OAuth spec — claude.ai hits this first) ────────────
+
+@router.get("/.well-known/oauth-protected-resource", include_in_schema=False)
+@router.get("/.well-known/oauth-protected-resource/{path:path}", include_in_schema=False)
+def oauth_protected_resource(request: Request, path: str = ""):
+    base = str(request.base_url).rstrip("/")
+    return {
+        "resource": base,
+        "authorization_servers": [base],
+    }
+
+
+# ── Auth server metadata ──────────────────────────────────────────────────────
 
 @router.get("/.well-known/oauth-authorization-server", include_in_schema=False)
 def oauth_metadata(request: Request):
@@ -38,11 +53,37 @@ def oauth_metadata(request: Request):
         "issuer": base,
         "authorization_endpoint": f"{base}/oauth/authorize",
         "token_endpoint": f"{base}/oauth/token",
+        "registration_endpoint": f"{base}/oauth/register",
         "response_types_supported": ["code"],
         "grant_types_supported": ["authorization_code", "refresh_token"],
         "code_challenge_methods_supported": ["S256"],
         "token_endpoint_auth_methods_supported": ["none"],
     }
+
+
+# ── Dynamic Client Registration (RFC 7591) ────────────────────────────────────
+
+@router.post("/oauth/register", include_in_schema=False)
+async def register_client(request: Request):
+    """Accept any client registration and return a stable client_id.
+
+    Single-user personal tool — no client database needed. We accept all
+    registrations and echo back the provided metadata with a fixed client_id
+    so claude.ai can proceed without manual configuration.
+    """
+    try:
+        body = await request.json()
+    except Exception:
+        body = {}
+
+    return JSONResponse({
+        "client_id": "qm-mcp-client",
+        "client_id_issued_at": int(time.time()),
+        "token_endpoint_auth_method": "none",
+        "grant_types": body.get("grant_types", ["authorization_code"]),
+        "response_types": body.get("response_types", ["code"]),
+        "redirect_uris": body.get("redirect_uris", []),
+    }, status_code=201)
 
 
 # ── Consent page ──────────────────────────────────────────────────────────────
@@ -109,12 +150,12 @@ def authorize_get(
 
 @router.post("/oauth/authorize", response_class=HTMLResponse, include_in_schema=False)
 def authorize_post(
-    client_id: str        = Form(...),
-    redirect_uri: str     = Form(...),
-    code_challenge: str   = Form(...),
+    client_id: str             = Form(...),
+    redirect_uri: str          = Form(...),
+    code_challenge: str        = Form(...),
     code_challenge_method: str = Form("S256"),
-    state: str            = Form(""),
-    password: str         = Form(...),
+    state: str                 = Form(""),
+    password: str              = Form(...),
 ):
     if password != get_settings().secret_key:
         return HTMLResponse(
