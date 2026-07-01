@@ -32,11 +32,53 @@ def _db():
     return SessionLocal()
 
 
+# ── Discovery ─────────────────────────────────────────────────────────────────
+
+@mcp.tool()
+def qm_help() -> str:
+    """QM Kit Manager — list every available tool with a one-line description.
+
+    Call this first to discover what QM can do. QM manages first aid and
+    outdoor equipment kits, items, bundles, and a shopping/restock list.
+    """
+    return """QM Kit Manager tools
+====================
+
+CONNECTIVITY
+  ping                  — verify the QM server is reachable
+
+KITS  (a kit holds items; one kit is the Store/stockroom)
+  list_kits             — list all kits with item counts
+  get_kit_contents      — full item list for one kit
+  create_kit            — create a new kit
+
+ITEMS  (individual pieces of equipment or supplies)
+  list_items            — list items, filter by kit or category
+  add_item              — add an item to a kit (name, category, quantity, expiry)
+  update_item           — change quantity, notes, expiry date, name, category
+  delete_item           — permanently remove an item
+
+BUNDLES  (named collections of kits + loose items for a trip or scenario)
+  list_bundles          — list all bundles
+  get_bundle_contents   — kits and loose items inside a bundle
+  create_bundle         — create a new bundle (not yet implemented as tool)
+
+SHOPPING LIST  (restock and procurement tracking)
+  list_shopping_items   — items needed / ordered / acquired
+  add_shopping_item     — add a restock suggestion to the shopping list
+  update_shopping_item  — mark an item needed / ordered / acquired
+
+ANALYSIS
+  get_inventory_summary — full snapshot: all kits, expiry flags, stock levels,
+                          shopping list — use this for gap analysis and restock planning
+"""
+
+
 # ── Connectivity ──────────────────────────────────────────────────────────────
 
 @mcp.tool()
 def ping() -> str:
-    """Confirm the QM MCP server is reachable and auth is working."""
+    """QM Kit Manager connectivity check — verify the server is reachable and auth is valid."""
     return "QM Kit Manager is online and your token is valid."
 
 
@@ -44,7 +86,12 @@ def ping() -> str:
 
 @mcp.tool()
 def list_kits() -> list[dict]:
-    """List all kits. The Store kit (is_store=true) is always first."""
+    """QM: list all first aid and outdoor equipment kits.
+
+    Returns each kit's id, name, category, and item count.
+    The Store kit (is_store=true) is the central stockroom — always listed first.
+    Use get_kit_contents to see the items inside a specific kit.
+    """
     db = _db()
     try:
         return [
@@ -63,7 +110,11 @@ def list_kits() -> list[dict]:
 
 @mcp.tool()
 def get_kit_contents(kit_id: str) -> dict:
-    """Get a kit and all its items. kit_id is a UUID string."""
+    """QM: get all items inside a specific kit (first aid kit, outdoor kit, or Store).
+
+    kit_id: UUID string from list_kits.
+    Returns the kit with a full item list including quantities, expiry dates, and notes.
+    """
     db = _db()
     try:
         kit = svc.get_kit(db, kit_id)
@@ -94,7 +145,12 @@ def get_kit_contents(kit_id: str) -> dict:
 
 @mcp.tool()
 def create_kit(name: str, kit_category: str = "") -> dict:
-    """Create a new kit. Returns the created kit with its id."""
+    """QM: create a new kit (first aid kit, day pack, vehicle kit, etc.).
+
+    name: display name for the kit.
+    kit_category: optional grouping label (e.g. 'Outdoors', 'Vehicle', 'Home').
+    Returns the new kit with its UUID.
+    """
     db = _db()
     try:
         kit = svc.create_kit(db, name=name, kit_category=kit_category)
@@ -107,11 +163,14 @@ def create_kit(name: str, kit_category: str = "") -> dict:
 
 @mcp.tool()
 def list_items(kit_id: str | None = None, category: str | None = None) -> list[dict]:
-    """List items, optionally filtered by kit_id (UUID string) and/or category.
+    """QM: list equipment and supply items, optionally filtered by kit or category.
 
-    Valid categories: Wound Care, Sanitisation, Medications, Airway & Breathing,
-    Immobilisation, Footcare, Tools & Equipment, Navigation, Shelter,
-    Cooking & Water, Lighting, Communication, Other.
+    kit_id: UUID string — omit to list items across all kits.
+    category: filter to one category. Valid values:
+      Wound Care, Sanitisation, Medications, Airway & Breathing,
+      Immobilisation, Footcare, Tools & Equipment, Navigation, Shelter,
+      Cooking & Water, Lighting, Communication, Other.
+    Returns quantities, expiry dates, and notes for each item.
     """
     db = _db()
     try:
@@ -145,12 +204,15 @@ def add_item(
     notes: str = "",
     size: str | None = None,
 ) -> dict:
-    """Add an item to a kit.
+    """QM: add a new item (supply, medication, equipment) to a kit or the Store.
 
-    kit_id: UUID string of the target kit.
-    category: must be one of the valid ItemCategory values.
-    expiry_date: ISO date string (YYYY-MM-DD) or omit if no expiry.
-    Returns the created item with its id.
+    kit_id: UUID of the target kit (from list_kits).
+    name: item name, e.g. 'Plasters', 'Ibuprofen', 'Tourniquet'.
+    category: one of the valid ItemCategory values (see list_items for the full list).
+    quantity: number of units.
+    expiry_date: ISO date YYYY-MM-DD, or omit if the item has no expiry.
+    size: optional size/variant descriptor (e.g. 'Large', '10cm x 10cm').
+    Returns the created item with its UUID.
     """
     db = _db()
     try:
@@ -188,10 +250,11 @@ def update_item(
     category: str | None = None,
     size: str | None = None,
 ) -> dict:
-    """Update one or more fields on an existing item. Only provided fields are changed.
+    """QM: update quantity, notes, expiry date, name, or category on an existing inventory item.
 
-    item_id: UUID string.
-    expiry_date: ISO date string (YYYY-MM-DD) or null to clear.
+    item_id: UUID string (from list_items or get_kit_contents).
+    Only fields you provide are changed — omit anything you want to leave unchanged.
+    expiry_date: ISO date YYYY-MM-DD.
     """
     db = _db()
     try:
@@ -226,7 +289,10 @@ def update_item(
 
 @mcp.tool()
 def delete_item(item_id: str) -> dict:
-    """Permanently delete an item from a kit. item_id is a UUID string."""
+    """QM: permanently delete an item from a kit. This cannot be undone.
+
+    item_id: UUID string (from list_items or get_kit_contents).
+    """
     db = _db()
     try:
         from app.models.db import KitItem
@@ -245,7 +311,11 @@ def delete_item(item_id: str) -> dict:
 
 @mcp.tool()
 def list_bundles() -> list[dict]:
-    """List all bundles with their kit count and loose item count."""
+    """QM: list all bundles (named collections of kits and loose items for trips or scenarios).
+
+    Returns each bundle's id, name, notes, and counts of kits and loose items.
+    Use get_bundle_contents to see what's inside a specific bundle.
+    """
     db = _db()
     try:
         return [
@@ -264,7 +334,10 @@ def list_bundles() -> list[dict]:
 
 @mcp.tool()
 def get_bundle_contents(bundle_id: str) -> dict:
-    """Get a bundle with its kits (and their items) and any loose items."""
+    """QM: get the full contents of a bundle — its kits (with items) and any loose items.
+
+    bundle_id: UUID string from list_bundles.
+    """
     db = _db()
     try:
         bundle = svc.get_bundle(db, bundle_id)
@@ -310,7 +383,11 @@ def get_bundle_contents(bundle_id: str) -> dict:
 
 @mcp.tool()
 def list_shopping_items(include_acquired: bool = False) -> list[dict]:
-    """List shopping list items. By default excludes acquired items."""
+    """QM: list the shopping/restock list — items that need to be purchased or replenished.
+
+    include_acquired: set True to also return items already acquired (default: False).
+    Status values: needed, ordered, acquired.
+    """
     db = _db()
     try:
         return [
@@ -333,10 +410,12 @@ def add_shopping_item(
     notes: str = "",
     kit_id: str | None = None,
 ) -> dict:
-    """Add an item to the shopping list (source=llm).
+    """QM: add an item to the shopping/restock list.
 
-    Use this to suggest items that should be restocked or purchased.
-    kit_id: optional UUID string of the kit this item is for.
+    Use this to flag supplies or equipment that need to be purchased or replenished.
+    name: item to buy, e.g. 'Sterile dressings', 'Ibuprofen 200mg', 'Head torch'.
+    notes: optional context, e.g. 'running low' or 'expired — replace before trip'.
+    kit_id: optional UUID of the kit this item is for.
     """
     db = _db()
     try:
@@ -355,10 +434,10 @@ def add_shopping_item(
 
 @mcp.tool()
 def update_shopping_item(item_id: str, status: str) -> dict:
-    """Update the status of a shopping list item.
+    """QM: update the status of a shopping list item to track procurement progress.
 
-    item_id: UUID string.
-    status: one of 'needed', 'ordered', 'acquired'.
+    item_id: UUID string from list_shopping_items.
+    status: 'needed' → 'ordered' → 'acquired'.
     """
     db = _db()
     try:
@@ -377,10 +456,12 @@ def update_shopping_item(item_id: str, status: str) -> dict:
 
 @mcp.tool()
 def get_inventory_summary() -> dict:
-    """Return a full inventory snapshot for gap analysis and restock planning.
+    """QM: full inventory snapshot for gap analysis, expiry review, and restock planning.
 
-    Includes all kits with item counts, expiry status, and stock levels.
-    Use this as context before suggesting shopping list additions.
+    Returns all kits with their items flagged for expiry (expired / expiring_soon)
+    and stock status (out_of_stock). Also includes the current shopping list.
+    Call this before making restock suggestions so you don't duplicate items
+    already on the shopping list.
     """
     db = _db()
     try:
