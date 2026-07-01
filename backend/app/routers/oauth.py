@@ -63,6 +63,13 @@ def oauth_metadata(request: Request):
 
 # ── Dynamic Client Registration (RFC 7591) ────────────────────────────────────
 
+@router.get("/oauth/register", include_in_schema=False)
+async def registration_info(request: Request):
+    """Some clients probe GET before POSTing — return endpoint info."""
+    base = str(request.base_url).rstrip("/")
+    return {"registration_endpoint": f"{base}/oauth/register"}
+
+
 @router.post("/oauth/register", include_in_schema=False)
 async def register_client(request: Request):
     """Accept any client registration and return a stable client_id.

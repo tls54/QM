@@ -30,16 +30,15 @@ app.include_router(models.router)
 app.include_router(inventory.router)
 
 def _mcp_auth_wrapper(asgi_app):
-    """Reject requests to /mcp without a valid JWT Bearer token.
+    """Gate /mcp requests behind JWT auth; pass all other paths straight through.
 
-    The 401 includes a WWW-Authenticate header pointing to the resource
-    metadata URL so claude.ai can discover the OAuth server automatically.
+    The Mount("/", ...) pattern intercepts everything FastAPI doesn't fully match
+    (including method-not-allowed cases), so we must only enforce auth on /mcp.
     """
     async def wrapped(scope, receive, send):
-        if scope["type"] == "http":
+        if scope["type"] == "http" and scope.get("path", "").startswith("/mcp"):
             headers = dict(scope.get("headers", []))
             host = headers.get(b"host", b"").decode()
-            # Infer scheme from forwarded headers (Railway terminates TLS)
             scheme = "https" if headers.get(b"x-forwarded-proto", b"http").decode() == "https" else "http"
             base = f"{scheme}://{host}"
             resource_meta = f"{base}/.well-known/oauth-protected-resource"
