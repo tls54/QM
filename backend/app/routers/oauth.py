@@ -15,7 +15,7 @@ import time
 from urllib.parse import urlencode
 
 from fastapi import APIRouter, Depends, Form, HTTPException, Request, status
-from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse, Response
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
 from app.config import get_settings
@@ -64,10 +64,8 @@ def oauth_metadata(request: Request):
 # ── Dynamic Client Registration (RFC 7591) ────────────────────────────────────
 
 @router.get("/oauth/register", include_in_schema=False)
-async def registration_info(request: Request):
-    """Some clients probe GET before POSTing — return endpoint info."""
-    base = str(request.base_url).rstrip("/")
-    return {"registration_endpoint": f"{base}/oauth/register"}
+async def register_get():
+    return Response(status_code=405, headers={"Allow": "POST"})
 
 
 @router.post("/oauth/register", include_in_schema=False)
