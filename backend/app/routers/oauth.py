@@ -11,11 +11,10 @@ POST /oauth/token                              — exchange code or refresh toke
 GET  /auth/device-token                        — one-time iOS bootstrap: SECRET_KEY → long-lived JWT
 """
 
-import time
 from urllib.parse import urlencode
 
 from fastapi import APIRouter, Depends, Form, HTTPException, Request, status
-from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse, Response
+from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
 from app.config import get_settings
@@ -53,7 +52,6 @@ def oauth_metadata(request: Request):
         "issuer": base,
         "authorization_endpoint": f"{base}/oauth/authorize",
         "token_endpoint": f"{base}/oauth/token",
-        "registration_endpoint": f"{base}/oauth/register",
         "response_types_supported": ["code"],
         "grant_types_supported": ["authorization_code", "refresh_token"],
         "code_challenge_methods_supported": ["S256"],
@@ -62,34 +60,6 @@ def oauth_metadata(request: Request):
 
 
 # ── Dynamic Client Registration (RFC 7591) ────────────────────────────────────
-
-@router.get("/oauth/register", include_in_schema=False)
-async def register_get():
-    return Response(status_code=405, headers={"Allow": "POST"})
-
-
-@router.post("/oauth/register", include_in_schema=False)
-async def register_client(request: Request):
-    """Accept any client registration and return a stable client_id.
-
-    Single-user personal tool — no client database needed. We accept all
-    registrations and echo back the provided metadata with a fixed client_id
-    so claude.ai can proceed without manual configuration.
-    """
-    try:
-        body = await request.json()
-    except Exception:
-        body = {}
-
-    return JSONResponse({
-        "client_id": "qm-mcp-client",
-        "client_id_issued_at": int(time.time()),
-        "token_endpoint_auth_method": "none",
-        "grant_types": body.get("grant_types", ["authorization_code"]),
-        "response_types": body.get("response_types", ["code"]),
-        "redirect_uris": body.get("redirect_uris", []),
-    }, status_code=201)
-
 
 # ── Consent page ──────────────────────────────────────────────────────────────
 
