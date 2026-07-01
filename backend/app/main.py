@@ -4,7 +4,7 @@ from fastapi import FastAPI
 
 from app.database import Base, engine
 from app.models import db as db_models  # noqa: F401 (registers ORM models with Base)
-from app.routers import health, ask, models
+from app.routers import health, ask, models, inventory
 
 
 @asynccontextmanager
@@ -24,3 +24,4 @@ app = FastAPI(
 app.include_router(health.router)
 app.include_router(ask.router)
 app.include_router(models.router)
+app.include_router(inventory.router)

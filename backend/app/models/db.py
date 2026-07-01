@@ -12,6 +12,10 @@ def _uuid_pk() -> Mapped[uuid.UUID]:
     return mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
 
 
+def _now() -> datetime:
+    return datetime.utcnow()
+
+
 bundle_kits = Table(
     "bundle_kits",
     Base.metadata,
@@ -29,7 +33,8 @@ class Kit(Base):
     kit_category: Mapped[str] = mapped_column(String, default="")
     kit_icon: Mapped[str] = mapped_column(String, default="cross.case.fill")
     kit_icon_color: Mapped[str] = mapped_column(String, default="teal")
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=_now, onupdate=_now)
 
     items: Mapped[list["KitItem"]] = relationship(
         back_populates="kit", cascade="all, delete-orphan"
@@ -51,6 +56,8 @@ class KitItem(Base):
     notes: Mapped[str] = mapped_column(String, default="")
     track_stock: Mapped[bool] = mapped_column(Boolean, default=True)
     size: Mapped[str | None] = mapped_column(String, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=_now, onupdate=_now)
 
     kit: Mapped["Kit"] = relationship(back_populates="items")
 
@@ -63,7 +70,8 @@ class Bundle(Base):
     notes: Mapped[str] = mapped_column(String, default="")
     kit_icon: Mapped[str] = mapped_column(String, default="shippingbox.fill")
     kit_icon_color: Mapped[str] = mapped_column(String, default="teal")
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=_now, onupdate=_now)
 
     kits: Mapped[list["Kit"]] = relationship(secondary=bundle_kits, back_populates="bundles")
     items: Mapped[list["BundleItem"]] = relationship(
@@ -85,6 +93,8 @@ class BundleItem(Base):
     notes: Mapped[str] = mapped_column(String, default="")
     track_stock: Mapped[bool] = mapped_column(Boolean, default=True)
     size: Mapped[str | None] = mapped_column(String, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=_now, onupdate=_now)
 
     bundle: Mapped["Bundle"] = relationship(back_populates="items")
 
@@ -96,11 +106,12 @@ class ShoppingItem(Base):
     name: Mapped[str] = mapped_column(String, nullable=False)
     notes: Mapped[str] = mapped_column(String, default="")
     status: Mapped[str] = mapped_column(String, default="needed")  # needed | ordered | acquired
-    source: Mapped[str] = mapped_column(String, default="user")  # user | llm
+    source: Mapped[str] = mapped_column(String, default="user")    # user | llm
     kit_id: Mapped[uuid.UUID | None] = mapped_column(
         ForeignKey("kits.id", ondelete="SET NULL"), nullable=True
     )
     bundle_id: Mapped[uuid.UUID | None] = mapped_column(
         ForeignKey("bundles.id", ondelete="SET NULL"), nullable=True
     )
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=_now, onupdate=_now)
