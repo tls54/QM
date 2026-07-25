@@ -378,6 +378,39 @@ def get_bundle_contents(bundle_id: str) -> dict:
         db.close()
 
 
+@mcp.tool()
+def create_bundle(name: str, notes: str = "") -> dict:
+    """QM: create a new bundle (a named collection of kits and loose items for a trip or scenario).
+
+    name: display name for the bundle (e.g. 'Weekend Hike', 'Car Kit').
+    notes: optional free-text description.
+    Returns the new bundle with its UUID. Use add_kit_to_bundle to attach existing kits.
+    """
+    db = _db()
+    try:
+        bundle = svc.create_bundle(db, name=name, notes=notes)
+        return {"id": str(bundle.id), "name": bundle.name, "notes": bundle.notes}
+    finally:
+        db.close()
+
+
+@mcp.tool()
+def add_kit_to_bundle(bundle_id: str, kit_id: str) -> dict:
+    """QM: attach an existing kit to a bundle. Kits can belong to multiple bundles at once.
+
+    bundle_id: UUID from list_bundles or create_bundle.
+    kit_id: UUID from list_kits.
+    """
+    db = _db()
+    try:
+        bundle = svc.add_kit_to_bundle(db, bundle_id=bundle_id, kit_id=kit_id)
+        if bundle is None:
+            return {"error": f"Bundle {bundle_id} or kit {kit_id} not found"}
+        return {"id": str(bundle.id), "name": bundle.name, "kit_count": len(bundle.kits)}
+    finally:
+        db.close()
+
+
 # ── Shopping list ─────────────────────────────────────────────────────────────
 
 @mcp.tool()
