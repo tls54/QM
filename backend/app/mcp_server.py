@@ -57,10 +57,13 @@ ITEMS  (individual pieces of equipment or supplies)
   update_item           — change quantity, notes, expiry date, name, category
   delete_item           — permanently remove an item
 
-BUNDLES  (named collections of kits + loose items for a trip or scenario)
+BUNDLES  (named collections of kits + loose/cherry-picked items for a trip or scenario)
   list_bundles          — list all bundles
-  get_bundle_contents   — kits and loose items inside a bundle
-  create_bundle         — create a new bundle (not yet implemented as tool)
+  get_bundle_contents   — kits and items inside a bundle
+  create_bundle         — create a new bundle
+  add_kit_to_bundle     — attach a whole kit to a bundle
+  add_item_to_bundle    — cherry-pick a single item out of a kit into a bundle
+  remove_item_from_bundle — remove an item (loose or cherry-picked) from a bundle
 
 SHOPPING LIST  (restock and procurement tracking)
   list_shopping_items   — items needed / ordered / acquired
@@ -306,6 +309,32 @@ def delete_item(item_id: str) -> dict:
         db.close()
 
 
+def _serialize_bundle_item(i) -> dict:
+    """A bundle item is either a standalone loose item or a link to a KitItem
+    cherry-picked out of a kit — for links, read display data live from the kit
+    item so it can never drift from the source."""
+    if i.source_kit_item_id is not None and i.source_item is not None:
+        src = i.source_item
+        return {
+            "id": str(i.id),
+            "name": src.name,
+            "category": src.category,
+            "quantity": src.quantity,
+            "expiry_date": src.expiry_date.isoformat() if src.expiry_date else None,
+            "from_kit": src.kit.name,
+            "source_kit_item_id": str(src.id),
+        }
+    return {
+        "id": str(i.id),
+        "name": i.name,
+        "category": i.category,
+        "quantity": i.quantity,
+        "expiry_date": i.expiry_date.isoformat() if i.expiry_date else None,
+        "from_kit": None,
+        "source_kit_item_id": None,
+    }
+
+
 # ── Bundles ───────────────────────────────────────────────────────────────────
 
 @mcp.tool()
@@ -364,15 +393,7 @@ def get_bundle_contents(bundle_id: str) -> dict:
                 }
                 for k in bundle.kits
             ],
-            "loose_items": [
-                {
-                    "id": str(i.id),
-                    "name": i.name,
-                    "category": i.category,
-                    "quantity": i.quantity,
-                }
-                for i in bundle.items
-            ],
+            "loose_items": [_serialize_bundle_item(i) for i in bundle.items],
         }
     finally:
         db.close()
@@ -407,6 +428,46 @@ def add_kit_to_bundle(bundle_id: str, kit_id: str) -> dict:
         if bundle is None:
             return {"error": f"Bundle {bundle_id} or kit {kit_id} not found"}
         return {"id": str(bundle.id), "name": bundle.name, "kit_count": len(bundle.kits)}
+    finally:
+        db.close()
+
+
+@mcp.tool()
+def add_item_to_bundle(bundle_id: str, kit_item_id: str) -> dict:
+    """QM: cherry-pick a single item out of a kit and add it to a bundle, without
+    attaching the whole kit. Use this when a bundle needs only some items from a
+    kit (e.g. pulling the tent out of a 'Tents' kit into a 'Camp' bundle) — for
+    whole-kit inclusion use add_kit_to_bundle instead.
+
+    The bundle always shows this item's live quantity/expiry from its source kit,
+    so restocking the kit updates the bundle automatically.
+
+    bundle_id: UUID from list_bundles or create_bundle.
+    kit_item_id: UUID of the item from get_kit_contents or list_items.
+    """
+    db = _db()
+    try:
+        link = svc.link_kit_item_to_bundle(db, bundle_id=bundle_id, kit_item_id=kit_item_id)
+        if link is None:
+            return {"error": f"Bundle {bundle_id} or item {kit_item_id} not found"}
+        return {"bundle_item_id": str(link.id), **_serialize_bundle_item(link)}
+    finally:
+        db.close()
+
+
+@mcp.tool()
+def remove_item_from_bundle(bundle_item_id: str) -> dict:
+    """QM: remove an item from a bundle (whether loose or cherry-picked from a kit).
+
+    Only removes the bundle's link/entry — never deletes the item from its source
+    kit. bundle_item_id comes from get_bundle_contents' loose_items list.
+    """
+    db = _db()
+    try:
+        ok = svc.remove_bundle_item(db, bundle_item_id=bundle_item_id)
+        if not ok:
+            return {"error": f"Bundle item {bundle_item_id} not found"}
+        return {"deleted": bundle_item_id}
     finally:
         db.close()
 

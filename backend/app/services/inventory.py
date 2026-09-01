@@ -159,6 +159,42 @@ def create_bundle_item(
     return item
 
 
+def link_kit_item_to_bundle(
+    db: Session, bundle_id: uuid.UUID, kit_item_id: uuid.UUID
+) -> BundleItem | None:
+    """Cherry-pick a single item out of a kit into a bundle.
+
+    Creates a link row rather than copying data, so the bundle always reflects the
+    kit item's current quantity/expiry/etc — no risk of the two drifting apart.
+    """
+    bundle = db.get(Bundle, bundle_id)
+    kit_item = db.get(KitItem, kit_item_id)
+    if bundle is None or kit_item is None:
+        return None
+    existing = (
+        db.query(BundleItem)
+        .filter_by(bundle_id=bundle_id, source_kit_item_id=kit_item_id)
+        .first()
+    )
+    if existing is not None:
+        return existing
+    link = BundleItem(bundle_id=bundle_id, source_kit_item_id=kit_item_id)
+    db.add(link)
+    db.commit()
+    db.refresh(link)
+    return link
+
+
+def remove_bundle_item(db: Session, bundle_item_id: uuid.UUID) -> bool:
+    """Remove an item (loose or linked) from a bundle. Never deletes the source kit item."""
+    item = db.get(BundleItem, bundle_item_id)
+    if item is None:
+        return False
+    db.delete(item)
+    db.commit()
+    return True
+
+
 # ── Shopping list ─────────────────────────────────────────────────────────────
 
 

@@ -1,6 +1,7 @@
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
+from sqlalchemy import text
 
 from app.database import Base, engine
 from app.models import db as db_models  # noqa: F401 (registers ORM models with Base)
@@ -12,6 +13,15 @@ from app.services.oauth import verify_token
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     Base.metadata.create_all(bind=engine)
+    # create_all only adds new tables — patch bundle_items in place for existing
+    # deployments so cherry-picked kit items can be linked without duplicating data.
+    with engine.begin() as conn:
+        conn.execute(text(
+            "ALTER TABLE bundle_items ADD COLUMN IF NOT EXISTS source_kit_item_id UUID "
+            "REFERENCES kit_items(id) ON DELETE CASCADE"
+        ))
+        conn.execute(text("ALTER TABLE bundle_items ALTER COLUMN name DROP NOT NULL"))
+        conn.execute(text("ALTER TABLE bundle_items ALTER COLUMN category DROP NOT NULL"))
     async with mcp.session_manager.run():
         yield
 

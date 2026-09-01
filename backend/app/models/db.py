@@ -80,14 +80,20 @@ class Bundle(Base):
 
 
 class BundleItem(Base):
-    """Loose items in a bundle that don't belong to any kit."""
+    """An item inside a bundle: either a standalone loose item (name/category/etc set
+    directly, source_kit_item_id null) or a link to a KitItem cherry-picked out of a
+    kit (source_kit_item_id set — display data is read live from the KitItem so it
+    can't drift from the source kit)."""
 
     __tablename__ = "bundle_items"
 
     id: Mapped[uuid.UUID] = _uuid_pk()
     bundle_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("bundles.id", ondelete="CASCADE"))
-    name: Mapped[str] = mapped_column(String, nullable=False)
-    category: Mapped[str] = mapped_column(String, nullable=False)
+    source_kit_item_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("kit_items.id", ondelete="CASCADE"), nullable=True
+    )
+    name: Mapped[str | None] = mapped_column(String, nullable=True)
+    category: Mapped[str | None] = mapped_column(String, nullable=True)
     quantity: Mapped[int] = mapped_column(Integer, default=1)
     expiry_date: Mapped[date | None] = mapped_column(Date, nullable=True)
     notes: Mapped[str] = mapped_column(String, default="")
@@ -97,6 +103,7 @@ class BundleItem(Base):
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=_now, onupdate=_now)
 
     bundle: Mapped["Bundle"] = relationship(back_populates="items")
+    source_item: Mapped["KitItem | None"] = relationship()
 
 
 class ShoppingItem(Base):
