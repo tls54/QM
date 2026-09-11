@@ -237,3 +237,12 @@ def update_shopping_item(db: Session, item_id: uuid.UUID, **fields) -> ShoppingI
     db.commit()
     db.refresh(item)
     return item
+
+
+def delete_shopping_item(db: Session, item_id: uuid.UUID) -> bool:
+    item = db.get(ShoppingItem, item_id)
+    if item is None:
+        return False
+    db.delete(item)
+    db.commit()
+    return True

@@ -69,6 +69,7 @@ SHOPPING LIST  (restock and procurement tracking)
   list_shopping_items   — items needed / ordered / acquired
   add_shopping_item     — add a restock suggestion to the shopping list
   update_shopping_item  — mark an item needed / ordered / acquired
+  delete_shopping_item  — permanently remove an item from the shopping list
 
 ANALYSIS
   get_inventory_summary — full snapshot: all kits, expiry flags, stock levels,
@@ -541,6 +542,23 @@ def update_shopping_item(item_id: str, status: str) -> dict:
         if item is None:
             return {"error": f"Shopping item {item_id} not found"}
         return {"id": str(item.id), "name": item.name, "status": item.status}
+    finally:
+        db.close()
+
+
+@mcp.tool()
+def delete_shopping_item(item_id: str) -> dict:
+    """QM: permanently remove an item from the shopping/restock list.
+
+    item_id: UUID string from list_shopping_items.
+    """
+    db = _db()
+    try:
+        import uuid as _uuid
+        ok = svc.delete_shopping_item(db, _uuid.UUID(item_id))
+        if not ok:
+            return {"error": f"Shopping item {item_id} not found"}
+        return {"deleted": item_id}
     finally:
         db.close()
 
