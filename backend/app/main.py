@@ -1,12 +1,13 @@
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 
 from app.database import Base, engine
 from app.models import db as db_models  # noqa: F401 (registers ORM models with Base)
 from app.mcp_server import mcp
-from app.routers import health, ask, models, inventory, oauth
+from app.routers import health, ask, models, inventory, oauth, webapp_auth
 from app.services.oauth import verify_token
 
 
@@ -33,8 +34,16 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 app.include_router(health.router)
 app.include_router(oauth.router)
+app.include_router(webapp_auth.router)
 app.include_router(ask.router)
 app.include_router(models.router)
 app.include_router(inventory.router)

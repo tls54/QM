@@ -114,12 +114,20 @@ def issue_device_token() -> str:
     return _make_jwt("device", DEVICE_TOKEN_TTL)
 
 
+WEBAPP_TOKEN_TTL = 60 * 60 * 24 * 30  # 30 days
+
+
+def issue_webapp_token() -> str:
+    """Long-lived token for the browser inventory webapp, issued after password login."""
+    return _make_jwt("webapp", WEBAPP_TOKEN_TTL)
+
+
 def verify_token(token: str) -> dict | None:
-    """Return claims if valid access/device token, else None."""
+    """Return claims if valid access/device/webapp token, else None."""
     try:
         claims = jwt.decode(token, _signing_key(), algorithms=["HS256"])
     except jwt.PyJWTError:
         return None
-    if claims.get("type") not in ("access", "device"):
+    if claims.get("type") not in ("access", "device", "webapp"):
         return None
     return claims

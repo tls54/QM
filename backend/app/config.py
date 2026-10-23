@@ -13,6 +13,12 @@ class Settings(BaseSettings):
     # ── API security ──────────────────────────────────────────────────────────
     secret_key: str  # Bearer token required on all protected endpoints
 
+    # ── Webapp login ──────────────────────────────────────────────────────────
+    # Shared password gating the browser inventory webapp. Exchanged for a
+    # 30-day JWT (see services/oauth.issue_webapp_token) — not OAuth, just a
+    # lightweight single-password gate for a personal-use tool.
+    webapp_password: str = ""
+
     # ── Database ───────────────────────────────────────────────────────────────
     # Postgres connection string. On Railway, reference the Postgres service's
     # DATABASE_URL variable; locally, use the Railway "public" connection string.
