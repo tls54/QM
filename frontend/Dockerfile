@@ -22,5 +22,12 @@ COPY nginx.conf.template /etc/nginx/templates/default.conf.template
 # only names that are actual env vars (not nginx's own $uri etc.), so this is
 # safe — unlike `serve`, nginx reliably binds IPv4 0.0.0.0, which `serve`
 # doesn't (it binds IPv6-only `::`, invisible to Railway's IPv4 edge proxy).
+#
+# Also override the base image's nginx.conf (worker_processes auto) — on
+# Railway, `nproc` reports the host's full core count rather than this
+# container's actual quota, so "auto" spawns dozens of workers and gets
+# OOM-killed. Pin it to 1; this is a static file server, it doesn't need more.
+COPY nginx.conf /etc/nginx/nginx.conf
+
 ENV PORT=4173
 EXPOSE 4173
