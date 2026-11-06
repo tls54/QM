@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Trash2 } from "lucide-react";
 import {
   createShoppingItem,
   deleteShoppingItem,
@@ -62,8 +63,8 @@ export default function Shopping() {
                 <option value="ordered">Ordered</option>
                 <option value="acquired">Acquired</option>
               </select>
-              <button className="danger" onClick={() => remove(item)}>
-                ×
+              <button className="danger" onClick={() => remove(item)} aria-label="Delete item">
+                <Trash2 size={14} />
               </button>
             </div>
           </li>

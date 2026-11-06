@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { LogOut, Package, ShoppingCart, Layers } from "lucide-react";
 import { clearToken, getToken } from "./api";
 import Login from "./pages/Login";
 import Kits from "./pages/Kits";
@@ -32,19 +33,29 @@ export default function App() {
   return (
     <div className="app">
       <header className="app-header">
-        <h1>QM Inventory</h1>
+        <div className="app-brand">
+          <span className="app-logo">QM</span>
+          <div>
+            <h1>QM Inventory</h1>
+            <span className="app-subtitle">Kit &amp; bundle manager</span>
+          </div>
+        </div>
         <button className="logout" onClick={logout}>
+          <LogOut size={14} />
           Log out
         </button>
       </header>
       <nav className="tabs">
         <button className={tab === "kits" ? "active" : ""} onClick={() => setTab("kits")}>
+          <Package size={16} />
           Kits
         </button>
         <button className={tab === "bundles" ? "active" : ""} onClick={() => setTab("bundles")}>
+          <Layers size={16} />
           Bundles
         </button>
         <button className={tab === "shopping" ? "active" : ""} onClick={() => setTab("shopping")}>
+          <ShoppingCart size={16} />
           Shopping
         </button>
       </nav>

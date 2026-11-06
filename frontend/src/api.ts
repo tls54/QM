@@ -88,8 +88,10 @@ export type Bundle = {
 export type BundleItem = {
   id: string;
   bundle_id: string;
-  name: string;
-  category: string;
+  // Link-only rows (cherry-picked from a kit via the MCP add_item_to_bundle
+  // tool) carry no name/category of their own — display falls back to "—".
+  name: string | null;
+  category: string | null;
   quantity: number;
   expiry_date: string | null;
   notes: string;
@@ -108,6 +110,17 @@ export type ShoppingItem = {
 // ── Kits ───────────────────────────────────────────────────────────────────
 
 export const listKits = () => request<Kit[]>("/inventory/kits");
+export const createKit = (body: {
+  name: string;
+  is_store?: boolean;
+  kit_category?: string;
+  kit_icon?: string;
+  kit_icon_color?: string;
+}) =>
+  request<Kit>("/inventory/kits", {
+    method: "POST",
+    body: JSON.stringify(body),
+  });
 export const updateKit = (kitId: string, body: Partial<Kit>) =>
   request<Kit>(`/inventory/kits/${kitId}`, {
     method: "PATCH",
@@ -115,6 +128,22 @@ export const updateKit = (kitId: string, body: Partial<Kit>) =>
   });
 export const listKitItems = (kitId: string) =>
   request<KitItem[]>(`/inventory/kits/${kitId}/items`);
+export const createItem = (
+  kitId: string,
+  body: {
+    name: string;
+    category: string;
+    quantity?: number;
+    expiry_date?: string | null;
+    notes?: string;
+    track_stock?: boolean;
+    size?: string | null;
+  },
+) =>
+  request<KitItem>(`/inventory/kits/${kitId}/items`, {
+    method: "POST",
+    body: JSON.stringify(body),
+  });
 export const updateItem = (itemId: string, body: Partial<KitItem>) =>
   request<KitItem>(`/inventory/items/${itemId}`, {
     method: "PATCH",
@@ -123,11 +152,45 @@ export const updateItem = (itemId: string, body: Partial<KitItem>) =>
 export const deleteItem = (itemId: string) =>
   request<void>(`/inventory/items/${itemId}`, { method: "DELETE" });
 
+export const getSyncSnapshot = () =>
+  request<{ kits: (Kit & { items: KitItem[] })[] }>("/inventory/sync");
+
 // ── Bundles ────────────────────────────────────────────────────────────────
 
 export const listBundles = () => request<Bundle[]>("/inventory/bundles");
+export const createBundle = (body: {
+  name: string;
+  notes?: string;
+  kit_icon?: string;
+  kit_icon_color?: string;
+}) =>
+  request<Bundle>("/inventory/bundles", {
+    method: "POST",
+    body: JSON.stringify(body),
+  });
 export const getBundle = (bundleId: string) =>
   request<Bundle>(`/inventory/bundles/${bundleId}`);
+export const addKitToBundle = (bundleId: string, kitId: string) =>
+  request<Bundle>(`/inventory/bundles/${bundleId}/kits`, {
+    method: "POST",
+    body: JSON.stringify({ kit_id: kitId }),
+  });
+export const createBundleItem = (
+  bundleId: string,
+  body: {
+    name: string;
+    category: string;
+    quantity?: number;
+    expiry_date?: string | null;
+    notes?: string;
+    track_stock?: boolean;
+    size?: string | null;
+  },
+) =>
+  request<BundleItem>(`/inventory/bundles/${bundleId}/items`, {
+    method: "POST",
+    body: JSON.stringify(body),
+  });
 
 // ── Shopping list ──────────────────────────────────────────────────────────
 

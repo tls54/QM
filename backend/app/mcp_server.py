@@ -206,6 +206,7 @@ def add_item(
     expiry_date: str | None = None,
     notes: str = "",
     size: str | None = None,
+    track_stock: bool = True,
 ) -> dict:
     """QM: add a new item (supply, medication, equipment) to a kit or the Store.
 
@@ -215,6 +216,9 @@ def add_item(
     quantity: number of units.
     expiry_date: ISO date YYYY-MM-DD, or omit if the item has no expiry.
     size: optional size/variant descriptor (e.g. 'Large', '10cm x 10cm').
+    track_stock: whether quantity should be monitored for low-stock alerts.
+      Set False for one-off/durable gear (a jacket, a knife) where owning a
+      single unit isn't "low stock" — True (default) for consumables.
     Returns the created item with its UUID.
     """
     db = _db()
@@ -230,6 +234,7 @@ def add_item(
             expiry_date=parsed_expiry,
             notes=notes,
             size=size,
+            track_stock=track_stock,
         )
         return {
             "id": str(item.id),
@@ -238,6 +243,7 @@ def add_item(
             "category": item.category,
             "quantity": item.quantity,
             "expiry_date": item.expiry_date.isoformat() if item.expiry_date else None,
+            "track_stock": item.track_stock,
         }
     finally:
         db.close()
@@ -252,12 +258,16 @@ def update_item(
     name: str | None = None,
     category: str | None = None,
     size: str | None = None,
+    track_stock: bool | None = None,
 ) -> dict:
-    """QM: update quantity, notes, expiry date, name, or category on an existing inventory item.
+    """QM: update quantity, notes, expiry date, name, category, or stock tracking on an existing inventory item.
 
     item_id: UUID string (from list_items or get_kit_contents).
     Only fields you provide are changed — omit anything you want to leave unchanged.
     expiry_date: ISO date YYYY-MM-DD.
+    track_stock: whether quantity should be monitored for low-stock alerts.
+      Set False for one-off/durable gear where owning a single unit isn't
+      "low stock" (e.g. a jacket); True for consumables worth restocking.
     """
     db = _db()
     try:
@@ -273,6 +283,8 @@ def update_item(
             fields["category"] = category
         if size is not None:
             fields["size"] = size
+        if track_stock is not None:
+            fields["track_stock"] = track_stock
         if expiry_date is not None:
             fields["expiry_date"] = date.fromisoformat(expiry_date)
 
@@ -285,6 +297,7 @@ def update_item(
             "quantity": item.quantity,
             "notes": item.notes,
             "expiry_date": item.expiry_date.isoformat() if item.expiry_date else None,
+            "track_stock": item.track_stock,
         }
     finally:
         db.close()
